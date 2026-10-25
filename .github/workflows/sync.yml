@@ -1,0 +1,51 @@
+name: Sync from WordPress.org
+
+# Copies each release of the free plugin from WordPress.org into this
+# repository: the exact files every WordPress site downloads, one commit and
+# one tag (v<version>) per release. Nothing here is read from any private
+# repository. Runs daily and on demand.
+
+on:
+  schedule:
+    - cron: '41 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Latest version on WordPress.org
+        id: v
+        run: |
+          ver=$(curl -fsS "https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request%5Bslug%5D=cachingout" | python3 -c "import json,sys;print(json.load(sys.stdin)['version'])")
+          echo "version=$ver" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/v$ver" >/dev/null; then echo "new=no" >> "$GITHUB_OUTPUT"; else echo "new=yes" >> "$GITHUB_OUTPUT"; fi
+      - name: Copy the release
+        if: steps.v.outputs.new == 'yes'
+        env:
+          VER: ${{ steps.v.outputs.version }}
+        run: |
+          set -euo pipefail
+          tmp=$(mktemp -d)
+          curl -fsSL -o "$tmp/p.zip" "https://downloads.wordpress.org/plugin/cachingout.$VER.zip"
+          unzip -q "$tmp/p.zip" -d "$tmp/x"
+          test -f "$tmp/x/cachingout/cachingout.php"
+          # replace everything except the mirror's own files
+          find . -mindepth 1 -maxdepth 1 ! -name .git ! -name .github ! -name README.md -exec rm -rf {} +
+          cp -a "$tmp/x/cachingout/." .
+          git config user.name "cachingout-release-bot"
+          git config user.email "support@cachingout.com"
+          git add -A
+          git commit -m "Caching Out $VER, as published on WordPress.org"
+          git tag -a "v$VER" -m "Caching Out $VER"
+          git push origin HEAD --follow-tags
