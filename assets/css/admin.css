@@ -1,0 +1,2347 @@
+/**
+ * Caching Out - admin stylesheet.
+ *
+ * One hand-written sheet on the brand tokens (spec 35, 1.22.0). No
+ * framework: Bootstrap left the plugin in 1.22.0. Every block is BEM with
+ * the rs- prefix, every colour and length is a custom property declared
+ * on .cachingout-wrap, and nothing here runs for a visitor (the sheet is
+ * enqueued on the plugin's own screens only).
+ *
+ * Sections:
+ *   1. Tokens            9. Buttons
+ *   2. Shell and type   10. Alerts, callouts, Pro pointer
+ *   3. Accessibility    11. Chips
+ *   4. Header           12. Tables and lists
+ *   5. Layout and nav   13. Layout utilities and text
+ *   6. Cards, sections  14. Icons
+ *   7. Status strip     15. Database, License, Wizard
+ *   8. Fields           16. Responsive, motion, forced colours
+ *
+ * WordPress core's forms.css matches `input[type=text]`, `select`,
+ * `textarea` and `input[type=checkbox]` at specificity (0,1,1). Every
+ * control rule below therefore qualifies its class with the element
+ * (`input.rs-input`), which wins at (0,2,1) regardless of load order.
+ * The few `!important` flags are confined to the switch's hit target,
+ * where core sets width and height on the checkbox itself.
+ *
+ * @package CachingOut
+ * @since 0.1.0
+ * @since 1.22.0 Rewritten without Bootstrap.
+ */
+
+/* =======================================
+   1. Tokens
+   ======================================= */
+
+.cachingout-wrap {
+	/* Neutrals: green-shifted graphite (Design: Ink). */
+	--rs-paper: #ffffff;
+	--rs-ink-50: #f2f5f4;
+	--rs-ink-100: #e4eae7;
+	--rs-ink-200: #cbd5d1;
+	--rs-ink-300: #a9b6b2;
+	--rs-ink-400: #7c8c88;
+	--rs-ink-450: #6f807c;
+	--rs-ink-500: #576764;
+	--rs-ink-600: #3a4844;
+	--rs-ink-700: #202c29;
+	--rs-ink-900: #0e1413;
+	--rs-ink-950: #080b0a;
+
+	/* The brand, and the passing state (Design: Signal). */
+	--rs-signal-50: #ecfbf4;
+	--rs-signal-100: #d2f6e6;
+	--rs-signal-200: #9fe9cc;
+	--rs-signal-300: #5fd6ab;
+	--rs-signal-600: #057f58;
+	--rs-signal-700: #046345;
+	--rs-signal-800: #034a32;
+	--rs-signal-900: #023423;
+
+	/* The "before" state. Warm, and specifically not red. */
+	--rs-copper-100: #fbe7d8;
+	--rs-copper-400: #e38445;
+	--rs-copper-700: #8a3d12;
+
+	/* States. */
+	--rs-warning-100: #fdf1d6;
+	--rs-warning-300: #f2c24b;
+	--rs-warning-500: #c98a06;
+	--rs-warning-700: #8a5d02;
+	--rs-error-100: #fbe1de;
+	--rs-error-300: #ee7a70;
+	--rs-error-500: #c33025;
+	--rs-error-700: #96201a;
+
+	/* One warm neutral. */
+	--rs-sand: #efeae0;
+	--rs-sand-deep: #e3dccd;
+
+	/* Semantic aliases used throughout. */
+	--rs-text: var(--rs-ink-600);
+	--rs-heading: var(--rs-ink-900);
+	--rs-muted: var(--rs-ink-500);
+	--rs-border: var(--rs-ink-100);
+	--rs-border-strong: var(--rs-ink-200);
+	--rs-surface: var(--rs-paper);
+	--rs-surface-alt: var(--rs-ink-50);
+	--rs-accent: var(--rs-signal-700);
+	--rs-accent-hover: var(--rs-signal-800);
+	--rs-accent-active: var(--rs-signal-900);
+	--rs-accent-subtle: var(--rs-signal-50);
+	--rs-focus: var(--rs-signal-600);
+
+	/* Geometry. */
+	--rs-radius-sm: 4px;
+	--rs-radius-md: 8px;
+	--rs-radius-lg: 12px;
+	--rs-radius-xl: 16px;
+	--rs-radius-pill: 999px;
+	--rs-space-1: 4px;
+	--rs-space-2: 8px;
+	--rs-space-3: 12px;
+	--rs-space-4: 16px;
+	--rs-space-5: 20px;
+	--rs-space-6: 24px;
+	--rs-space-7: 32px;
+	--rs-space-8: 40px;
+	--rs-space-9: 48px;
+	--rs-space-10: 64px;
+	--rs-shadow-sm: 0 1px 2px rgba(14, 20, 19, 0.06);
+	--rs-shadow-md: 0 4px 12px rgba(14, 20, 19, 0.08);
+
+	/* Type. wp-admin loads no webfont of ours (spec 35): the system stack
+	   carries the body, the brand is carried by colour, space and figures. */
+	--rs-font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	--rs-font-heading: var(--rs-font-body);
+	--rs-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+	--rs-text-xs: 0.75rem;
+	--rs-text-sm: 0.8125rem;
+	--rs-text-base: 0.875rem;
+	--rs-text-md: 0.9375rem;
+	--rs-text-lg: 1.0625rem;
+	--rs-text-xl: 1.25rem;
+	--rs-text-metric: 1.75rem;
+
+	/* Motion. */
+	--rs-ease: cubic-bezier(0.2, 0, 0, 1);
+	--rs-fast: 120ms;
+	--rs-base: 180ms;
+}
+
+/* =======================================
+   2. Shell and type
+   ======================================= */
+
+.cachingout-wrap {
+	box-sizing: border-box;
+	max-width: 1280px;
+	margin: 12px 20px 48px 2px;
+	color: var(--rs-text);
+	font-family: var(--rs-font-body);
+	font-size: var(--rs-text-base);
+	line-height: 1.5;
+}
+
+.cachingout-wrap *,
+.cachingout-wrap *::before,
+.cachingout-wrap *::after {
+	box-sizing: border-box;
+}
+
+.cachingout-wrap h1,
+.cachingout-wrap h2,
+.cachingout-wrap h3,
+.cachingout-wrap h4,
+.cachingout-wrap h5,
+.cachingout-wrap h6 {
+	margin: 0;
+	color: var(--rs-heading);
+	font-family: var(--rs-font-heading);
+	font-weight: 600;
+	line-height: 1.25;
+	letter-spacing: -0.01em;
+}
+
+.cachingout-wrap p {
+	margin: 0 0 var(--rs-space-3);
+	font-size: inherit;
+}
+
+.cachingout-wrap p:last-child {
+	margin-bottom: 0;
+}
+
+.cachingout-wrap a {
+	color: var(--rs-accent);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 3px;
+	transition: color var(--rs-fast) var(--rs-ease);
+}
+
+.cachingout-wrap a:hover,
+.cachingout-wrap a:focus {
+	color: var(--rs-accent-hover);
+	text-decoration-thickness: 2px;
+}
+
+.cachingout-wrap a:focus-visible,
+.cachingout-wrap button:focus-visible,
+.cachingout-wrap [tabindex]:focus-visible {
+	outline: 2px solid var(--rs-focus);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+.cachingout-wrap code,
+.cachingout-wrap kbd,
+.cachingout-wrap .rs-mono {
+	font-family: var(--rs-font-mono);
+	font-size: 0.92em;
+	font-variant-numeric: tabular-nums;
+}
+
+.cachingout-wrap code {
+	padding: 1px 5px;
+	border-radius: var(--rs-radius-sm);
+	background: var(--rs-ink-50);
+	color: var(--rs-ink-700);
+}
+
+.cachingout-wrap ul,
+.cachingout-wrap ol {
+	margin: 0 0 var(--rs-space-3);
+	padding-left: 1.25em;
+}
+
+.cachingout-wrap ul:last-child,
+.cachingout-wrap ol:last-child {
+	margin-bottom: 0;
+}
+
+.cachingout-wrap hr {
+	margin: var(--rs-space-5) 0;
+	border: 0;
+	border-top: 1px solid var(--rs-border);
+}
+
+/* =======================================
+   3. Accessibility
+   ======================================= */
+
+.rs-skip-link {
+	position: absolute;
+	top: -100px;
+	left: 0;
+	z-index: 100000;
+	padding: 10px 20px;
+	background: var(--rs-accent, #046345);
+	color: #fff;
+	font-weight: 600;
+	border-radius: 0 0 8px 8px;
+	text-decoration: none;
+}
+
+.rs-skip-link:focus {
+	top: 0;
+	color: #fff;
+}
+
+.rs-sr-only {
+	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* =======================================
+   4. Header
+   ======================================= */
+
+.rs-header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--rs-space-4);
+	padding: var(--rs-space-5) 0 var(--rs-space-6);
+}
+
+.rs-header__brand {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--rs-space-4);
+	min-width: 0;
+}
+
+/* The brand mark on its ink tile: the SVG is inlined by
+   CachingOut_Brand::mark(), so this box only supplies the tile. */
+.rs-header__mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 44px;
+	height: 44px;
+	border-radius: 10px;
+	background: var(--rs-ink-950);
+	line-height: 1;
+}
+
+.rs-header__mark svg {
+	display: block;
+}
+
+.rs-header__title {
+	font-size: var(--rs-text-xl);
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+.rs-header__subtitle {
+	margin: 2px 0 0;
+	font-size: var(--rs-text-xs);
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--rs-accent);
+}
+
+.rs-header__meta {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--rs-space-2);
+}
+
+.rs-header__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--rs-space-2);
+}
+
+/* =======================================
+   5. Layout and navigation rail
+   ======================================= */
+
+.rs-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--rs-space-6);
+	align-items: start;
+}
+
+@media screen and (min-width: 1024px) {
+	.rs-layout {
+		grid-template-columns: 240px minmax(0, 1fr);
+	}
+}
+
+.rs-nav {
+	position: sticky;
+	top: 46px;
+	padding: var(--rs-space-2) 0;
+	background: var(--rs-surface);
+	border: 1px solid var(--rs-border);
+	border-radius: var(--rs-radius-lg);
+	box-shadow: var(--rs-shadow-sm);
+}
+
+.rs-nav__group {
+	margin: 0;
+	padding: var(--rs-space-3) var(--rs-space-4) var(--rs-space-1);
+	font-size: 0.6875rem;
+	font-weight: 700;
+	line-height: 1.2;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--rs-muted);
+}
+
+.rs-nav__group + .rs-nav__group,
+.rs-nav__list + .rs-nav__group {
+	margin-top: var(--rs-space-2);
+	padding-top: var(--rs-space-4);
+	border-top: 1px solid var(--rs-border);
+}
+
+.rs-nav__list {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin: 0;
+	padding: 0 var(--rs-space-2);
+	list-style: none;
+}
+
+.rs-nav__item {
+	margin: 0;
+}
+
+.cachingout-wrap .rs-nav__link {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: var(--rs-space-3);
+	min-height: 40px;
+	padding: var(--rs-space-2) var(--rs-space-3);
+	border-radius: var(--rs-radius-md);
+	color: var(--rs-text);
+	font-size: var(--rs-text-sm);
+	font-weight: 500;
+	text-decoration: none;
+	transition: background-color var(--rs-fast) var(--rs-ease), color var(--rs-fast) var(--rs-ease);
+}
+
+.cachingout-wrap .rs-nav__link:hover,
+.cachingout-wrap .rs-nav__link:focus {
+	background: var(--rs-ink-50);
+	color: var(--rs-heading);
+	text-decoration: none;
+}
+
+.cachingout-wrap .rs-nav__link .rs-icon {
+	flex: none;
+	width: 18px;
+	height: 18px;
+	color: var(--rs-ink-450);
+	transition: color var(--rs-fast) var(--rs-ease);
+}
+
+.cachingout-wrap .rs-nav__link--active,
+.cachingout-wrap .rs-nav__link--active:hover,
+.cachingout-wrap .rs-nav__link--active:focus {
+	background: var(--rs-accent-subtle);
+	color: var(--rs-signal-800);
+	font-weight: 600;
+}
+
+.cachingout-wrap .rs-nav__link--active::before {
+	content: "";
+	position: absolute;
+	top: 8px;
+	bottom: 8px;
+	left: -8px;
+	width: 3px;
+	border-radius: 0 3px 3px 0;
+	background: var(--rs-accent);
+}
+
+.cachingout-wrap .rs-nav__link--active .rs-icon {
+	color: var(--rs-accent);
+}
+
+.rs-main {
+	min-width: 0;
+}
+
+/* The content panel every tab renders into. */
+.rs-body {
+	padding: var(--rs-space-7);
+	background: var(--rs-surface);
+	border: 1px solid var(--rs-border);
+	border-radius: var(--rs-radius-lg);
+	box-shadow: var(--rs-shadow-sm);
+}
+
+/* "Documentation: <tab>" link above each tab's content. */
+.rs-tab-docs {
+	margin: 0 0 var(--rs-space-3);
+	font-size: var(--rs-text-sm);
+	text-align: right;
+}
+
+.cachingout-wrap .rs-tab-docs a {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--rs-space-1);
+	text-decoration: none;
+}
+
+.cachingout-wrap .rs-tab-docs a:hover,
+.cachingout-wrap .rs-tab-docs a:focus {
+	text-decoration: underline;
+}
+
+/* =======================================
+   6. Cards and sections
+   ======================================= */
+
+.rs-card {
+	background: var(--rs-surface);
+	border: 1px solid var(--rs-border);
+	border-radius: var(--rs-radius-lg);
+	transition: border-color var(--rs-fast) var(--rs-ease), box-shadow var(--rs-fast) var(--rs-ease);
+}
+
+.rs-card + .rs-card {
+	margin-top: var(--rs-space-5);
+}
+
+.rs-card--raised {
+	box-shadow: var(--rs-shadow-sm);
+}
+
+.rs-card--muted {
+	background: var(--rs-surface-alt);
+}
+
+.rs-card--accent {
+	border-color: var(--rs-signal-200);
+	background: var(--rs-accent-subtle);
+}
+
+.rs-card--sand {
+	border-color: var(--rs-sand-deep);
+	background: var(--rs-sand);
+}
+
+.rs-card--full {
+	height: 100%;
+}
+
+.rs-card__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--rs-space-3);
+	padding: var(--rs-space-4) var(--rs-space-5);
+	border-bottom: 1px solid var(--rs-border);
+}
+
+.rs-card__title {
+	display: flex;
+	align-items: center;
+	gap: var(--rs-space-2);
+	font-size: var(--rs-text-md);
+	font-weight: 600;
+}
+
+.rs-card__title .rs-icon {
+	color: var(--rs-accent);
+}
+
+.rs-card__description {
+	margin: var(--rs-space-1) 0 0;
+	color: var(--rs-muted);
+	font-size: var(--rs-text-sm);
+}
+
+.rs-card__body {
+	padding: var(--rs-space-5);
+}
+
+.rs-card__body > :first-child {
+	margin-top: 0;
+}
+
+.rs-card__body > :last-child {
+	margin-bottom: 0;
+}
+
+.rs-card__footer {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--rs-space-2);
+	padding: var(--rs-space-3) var(--rs-space-5);
+	border-top: 1px solid var(--rs-border);
+	background: var(--rs-surface-alt);
+	border-radius: 0 0 var(--rs-radius-lg) var(--rs-radius-lg);
+}
+
+/* Section titles inside the panel. */
+
+.rs-title-section {
+	display: flex;
+	align-items: center;
+	gap: var(--rs-space-2);
+	margin: 0 0 var(--rs-space-5);
+	padding-bottom: var(--rs-space-3);
+	border-bottom: 1px solid var(--rs-border);
+	font-size: var(--rs-text-lg);
+	font-weight: 600;
+	letter-spacing: -0.015em;
+}
+
+.rs-title-section:not(:first-child) {
+	margin-top: var(--rs-space-8);
+}
+
+.rs-title-section h2 {
+	margin: 0;
+	font-size: inherit;
+	font-weight: inherit;
+}
+
+.rs-title-section .rs-icon {
+	color: var(--rs-accent);
+}
+
+.rs-section-heading {
+	margin: var(--rs-space-7) 0 var(--rs-space-3);
+	font-size: var(--rs-text-md);
+	font-weight: 600;
+}
+
+.rs-eyebrow {
+	margin: 0 0 var(--rs-space-2);
+	font-size: var(--rs-text-xs);
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--rs-accent);
+}
+
+.rs-desc {
+	margin: 0 0 var(--rs-space-5);
+	max-width: 68ch;
+	color: var(--rs-muted);
+	font-size: var(--rs-text-base);
+}
+
+/* =======================================
+   7. Status strip
+   ======================================= */
+
+.rs-stats {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--rs-space-3);
+	margin: 0 0 var(--rs-space-6);
+}
+
+@media screen and (min-width: 782px) {
+	.rs-stats {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+.rs-stat {
+	display: flex;
+	flex-direction: column;
+	gap: var(--rs-space-1);
+	min-width: 0;
+	padding: var(--rs-space-4) var(--rs-space-5);
+	border: 1px solid var(--rs-border);
+	border-radius: var(--rs-radius-lg);
+	background: var(--rs-surface-alt);
+}
+
+.rs-stat__label {
+	font-size: var(--rs-text-xs);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--rs-muted);
+}
+
+.rs-stat__value {
+	display: flex;
+	align-items: baseline;
+	gap: var(--rs-space-2);
+	font-family: var(--rs-font-mono);
+	font-size: var(--rs-text-metric);
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.1;
+	letter-spacing: -0.02em;
+	color: var(--rs-heading);
+	overflow-wrap: anywhere;
+}
+
+.rs-stat__unit {
+	font-family: var(--rs-font-body);
+	font-size: var(--rs-text-sm);
+	font-weight: 500;
+	color: var(--rs-muted);
+}
+
+.rs-stat__hint {
+	font-size: var(--rs-text-sm);
+	color: var(--rs-muted);
+}
+
+.rs-stat--good {
+	border-color: var(--rs-signal-200);
+	background: var(--rs-accent-subtle);
+}
+
+.rs-stat--good .rs-stat__value {
+	color: var(--rs-accent);
+}
+
+.rs-stat--warn {
+	border-color: var(--rs-warning-300);
+	background: var(--rs-warning-100);
+}
+
+.rs-stat--warn .rs-stat__value {
+	color: var(--rs-warning-700);
+}
+
+.rs-stat--bad {
+	border-color: var(--rs-error-300);
+	background: var(--rs-error-100);
+}
+
+.rs-stat--bad .rs-stat__value {
+	color: var(--rs-error-700);
+}
+
+.rs-stat--before {
+	border-color: var(--rs-copper-400);
+	background: var(--rs-copper-100);
+}
+
+.rs-stat--before .rs-stat__value {
+	color: var(--rs-copper-700);
+}
+
+/* =======================================
+   8. Fields
+   ======================================= */
+
+.rs-field {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--rs-space-6);
+	padding: var(--rs-space-4) 0;
+	border-bottom: 1px solid var(--rs-border);
+}
+
+.rs-field:last-child {
+	border-bottom: 0;
+}
+
+.rs-field__label {
+	flex: 0 0 240px;
+	padding-top: 2px;
+}
+
+.cachingout-wrap .rs-field__label label,
+.cachingout-wrap .rs-label {
+	display: block;
+	margin: 0;
+	color: var(--rs-heading);
+	font-size: var(--rs-text-base);
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.rs-field__control {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--rs-space-2);
+	min-width: 0;
+}
+
+.rs-field__control > .rs-switch {
+	margin-bottom: 0;
+}
+
+.cachingout-wrap .rs-help {
+	margin: 0;
+	max-width: 56ch;
+	color: var(--rs-muted);
+	font-size: var(--rs-text-sm);
+	line-height: 1.5;
+}
+
+/* Field without the row chrome: label over control, used inside cards. */
+.rs-field--stacked {
+	flex-direction: column;
+	gap: var(--rs-space-2);
+	padding: 0;
+	border: 0;
+}
+
+.rs-field--stacked .rs-field__label {
+	flex: none;
+	width: 100%;
+	padding: 0;
+}
+
+/* Text controls. Element-qualified so they beat WP core's forms.css. */
+
+.cachingout-wrap input.rs-input,
+.cachingout-wrap select.rs-select,
+.cachingout-wrap textarea.rs-textarea {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	min-height: 40px;
+	margin: 0;
+	padding: var(--rs-space-2) var(--rs-space-3);
+	color: var(--rs-heading);
+	font-family: inherit;
+	font-size: var(--rs-text-base);
+	line-height: 1.5;
+	background: var(--rs-surface);
+	border: 1px solid var(--rs-ink-450);
+	border-radius: var(--rs-radius-md);
+	box-shadow: none;
+	transition: border-color var(--rs-fast) var(--rs-ease), box-shadow var(--rs-fast) var(--rs-ease);
+}
+
+.cachingout-wrap input.rs-input::placeholder,
+.cachingout-wrap textarea.rs-textarea::placeholder {
+	color: var(--rs-ink-400);
+	opacity: 1;
+}
+
+.cachingout-wrap input.rs-input:focus,
+.cachingout-wrap select.rs-select:focus,
+.cachingout-wrap textarea.rs-textarea:focus {
+	border-color: var(--rs-focus);
+	outline: 2px solid var(--rs-focus);
+	outline-offset: 1px;
+	box-shadow: none;
+}
+
+.cachingout-wrap input.rs-input:disabled,
+.cachingout-wrap select.rs-select:disabled,
+.cachingout-wrap textarea.rs-textarea:disabled {
+	background: var(--rs-ink-50);
+	color: var(--rs-ink-500);
+	border-color: var(--rs-border-strong);
+	cursor: not-allowed;
+}
+
+.cachingout-wrap input.rs-input[aria-invalid="true"],
+.cachingout-wrap textarea.rs-textarea[aria-invalid="true"] {
+	border-color: var(--rs-error-500);
+}
+
+.cachingout-wrap textarea.rs-textarea {
+	min-height: auto;
+	line-height: 1.6;
+	resize: vertical;
+}
+
+.cachingout-wrap select.rs-select {
+	padding-right: var(--rs-space-8);
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23576764' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m4 6 4 4 4-4'/%3e%3c/svg%3e");
+	background-repeat: no-repeat;
+	background-position: right var(--rs-space-3) center;
+	background-size: 16px 16px;
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+.cachingout-wrap input.rs-input--sm,
+.cachingout-wrap select.rs-select--sm {
+	width: auto;
+	min-height: 32px;
+	padding-top: var(--rs-space-1);
+	padding-bottom: var(--rs-space-1);
+	font-size: var(--rs-text-sm);
+}
+
+.cachingout-wrap input.rs-input--short,
+.cachingout-wrap select.rs-select--short {
+	width: 140px;
+}
+
+.cachingout-wrap input.rs-input--medium {
+	width: 360px;
+}
+
+.cachingout-wrap input.rs-input--mono,
+.cachingout-wrap textarea.rs-textarea--mono {
+	font-family: var(--rs-font-mono);
+	font-size: var(--rs-text-sm);
+}
+
+/* Input with a unit or a button at its right edge. */
+.rs-input-group {
+	display: flex;
+	align-items: stretch;
+	max-width: 100%;
+}
+
+.rs-input-group > input.rs-input {
+	flex: 1 1 auto;
+	min-width: 0;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.rs-input-group__addon {
+	display: inline-flex;
+	align-items: center;
+	padding: 0 var(--rs-space-3);
+	color: var(--rs-muted);
+	font-size: var(--rs-text-sm);
+	background: var(--rs-ink-50);
+	border: 1px solid var(--rs-ink-450);
+	border-left: 0;
+	border-radius: 0 var(--rs-radius-md) var(--rs-radius-md) 0;
+}
+
+/* Plain checkbox and radio. */
+
+.rs-check {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--rs-space-3);
+	min-height: 24px;
+}
+
+.rs-check + .rs-check {
+	margin-top: var(--rs-space-2);
+}
+
+.cachingout-wrap input.rs-checkbox,
+.cachingout-wrap input.rs-radio {
+	flex: none;
+	width: 18px !important;
+	height: 18px !important;
+	min-width: 18px;
+	margin: 3px 0 0 !important;
+	padding: 0;
+	border: 1px solid var(--rs-ink-450) !important;
+	border-radius: var(--rs-radius-sm) !important;
+	background: var(--rs-surface) !important;
+	box-shadow: none;
+	cursor: pointer;
+	-webkit-appearance: none;
+	appearance: none;
+	transition: background-color var(--rs-fast) var(--rs-ease), border-color var(--rs-fast) var(--rs-ease);
+}
+
+.cachingout-wrap input.rs-radio {
+	border-radius: 50% !important;
+}
+
+/* WP core paints its checkmark on ::before; we paint ours on the same
+   pseudo-element so the two never stack. */
+.cachingout-wrap input.rs-checkbox::before,
+.cachingout-wrap input.rs-radio::before {
+	content: "" !important;
+	display: block;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	background: transparent no-repeat center / 12px 12px;
+}
+
+.cachingout-wrap input.rs-checkbox:checked,
+.cachingout-wrap input.rs-radio:checked {
+	background: var(--rs-accent) !important;
+	border-color: var(--rs-accent) !important;
+}
+
+.cachingout-wrap input.rs-checkbox:checked::before {
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m5 10 3.5 3.5L15 7'/%3e%3c/svg%3e");
+}
+
+.cachingout-wrap input.rs-radio:checked::before {
+	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3ccircle cx='10' cy='10' r='4' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+.cachingout-wrap input.rs-checkbox:focus-visible,
+.cachingout-wrap input.rs-radio:focus-visible {
+	outline: 2px solid var(--rs-focus);
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+.cachingout-wrap input.rs-checkbox:disabled,
+.cachingout-wrap input.rs-radio:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.rs-check__label {
+	color: var(--rs-text);
+	font-size: var(--rs-text-base);
+	line-height: 1.5;
+}
+
+.rs-check__label strong {
+	color: var(--rs-heading);
+	font-weight: 600;
+}
+
+/* --- Switch ----------------------------------------------------------
+   Emitted by CachingOut_Admin::render_switch_input(). The knob lives on
+   a sibling <span>, which WordPress core has no rules for, so track and
+   knob need no !important and cannot be broken by a core forms.css
+   change. The <input> stays a real checkbox (keyboard, Space, form
+   submission, screen-reader semantics), made transparent and stretched
+   over the track so it remains the hit target.
+
+   Width/height on the input DO need !important: core sets
+   input[type=checkbox] { width: 1rem; height: 1rem } at (0,1,1). Without
+   the flag the hit target collapses to a 16px square in the top-left of
+   the track and clicks elsewhere on the switch do nothing.
+   -------------------------------------------------------------------- */
+
+.cachingout-wrap .rs-switch {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	flex: none;
+	width: 44px;
+	height: 24px;
+	vertical-align: middle;
+}
+
+.cachingout-wrap .rs-switch__input {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	width: 44px !important;
+	height: 24px !important;
+	min-width: 44px !important;
+	min-height: 24px !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: var(--rs-radius-pill);
+	background: transparent !important;
+	box-shadow: none !important;
+	opacity: 0;
+	cursor: pointer;
+	-webkit-appearance: none !important;
+	appearance: none !important;
+}
+
+.cachingout-wrap .rs-switch__input::before {
+	content: none !important;
+	display: none !important;
+}
+
+.cachingout-wrap .rs-switch__track {
+	position: relative;
+	display: block;
+	width: 44px;
+	height: 24px;
+	border-radius: var(--rs-radius-pill);
+	background: var(--rs-ink-200);
+	pointer-events: none;
+	transition: background-color var(--rs-fast) var(--rs-ease), box-shadow var(--rs-fast) var(--rs-ease);
+}
+
+/* The knob. Position, not only colour, communicates state (WCAG 1.4.1). */
+.cachingout-wrap .rs-switch__track::after {
+	content: "";
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: var(--rs-paper);
+	box-shadow: var(--rs-shadow-sm), 0 0 0 1px rgba(14, 20, 19, 0.04);
+	transition: transform var(--rs-fast) var(--rs-ease);
+}
+
+.cachingout-wrap .rs-switch__input:checked + .rs-switch__track {
+	background: var(--rs-accent);
+}
+
+.cachingout-wrap .rs-switch__input:checked + .rs-switch__track::after {
+	transform: translateX(20px);
+}
+
+.cachingout-wrap .rs-switch__input:focus-visible + .rs-switch__track {
+	outline: 2px solid var(--rs-focus);
+	outline-offset: 2px;
+}
+
+.cachingout-wrap .rs-switch__input:disabled {
+	cursor: not-allowed;
+}
+
+.cachingout-wrap .rs-switch__input:disabled + .rs-switch__track {
+	opacity: 0.45;
+}
+
+/* The form's submit area. */
+.rs-form .submit,
+.rs-body .submit,
+.rs-form__actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--rs-space-2);
+	margin: var(--rs-space-6) 0 0;
+	padding: var(--rs-space-5) 0 0;
+	border-top: 1px solid var(--rs-border);
+}
+
+/* =======================================
+   9. Buttons
+   ======================================= */
+
+.cachingout-wrap .rs-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--rs-space-2);
+	min-height: 40px;
+	margin: 0;
+	padding: 0 var(--rs-space-4);
+	color: var(--rs-heading);
+	font-family: inherit;
+	font-size: var(--rs-text-base);
+	font-weight: 600;
+	line-height: 1.2;
+	text-decoration: none;
+	white-space: nowrap;
+	background: transparent;
+	border: 1px solid var(--rs-ink-450);
+	border-radius: var(--rs-radius-md);
+	box-shadow: none;
+	cursor: pointer;
+	vertical-align: middle;
+	transition: background-color var(--rs-fast) var(--rs-ease), border-color var(--rs-fast) var(--rs-ease), color var(--rs-fast) var(--rs-ease), transform var(--rs-fast) var(--rs-ease), box-shadow var(--rs-fast) var(--rs-ease);
+}
+
+.cachingout-wrap .rs-button:hover,
+.cachingout-wrap .rs-button:focus {
+	color: var(--rs-heading);
+	background: var(--rs-ink-50);
+	border-color: var(--rs-ink-600);
+	text-decoration: none;
+}
+
+.cachingout-wrap .rs-button:active {
+	background: var(--rs-ink-100);
+}
+
+.cachingout-wrap .rs-button:focus-visible {
+	outline: 2px solid var(--rs-focus);
+	outline-offset: 2px;
+}
+
+.cachingout-wrap .rs-button:disabled,
+.cachingout-wrap .rs-button[aria-disabled="true"],
+.cachingout-wrap .rs-button.is-disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: none;
+}
+
+.cachingout-wrap .rs-button .rs-icon {
+	flex: none;
+	width: 16px;
+	height: 16px;
+}
+
+/* Primary: the one green per screen. */
+.cachingout-wrap .rs-button--primary {
+	color: var(--rs-paper);
+	background: var(--rs-accent);
+	border-color: var(--rs-accent);
+	box-shadow: var(--rs-shadow-sm);
+}
+
+.cachingout-wrap .rs-button--primary:hover,
+.cachingout-wrap .rs-button--primary:focus {
+	color: var(--rs-paper);
+	background: var(--rs-accent-hover);
+	border-color: var(--rs-accent-hover);
+	box-shadow: var(--rs-shadow-md);
+	transform: translateY(-1px);
+}
+
+.cachingout-wrap .rs-button--primary:active {
+	background: var(--rs-accent-active);
+	border-color: var(--rs-accent-active);
+	box-shadow: none;
+	transform: none;
+}
+
+/* Ghost: no border, fill on hover only. Tertiary actions in cards. */
+.cachingout-wrap .rs-button--ghost {
+	color: var(--rs-text);
+	border-color: transparent;
+}
+
+.cachingout-wrap .rs-button--ghost:hover,
+.cachingout-wrap .rs-button--ghost:focus {
+	border-color: transparent;
+	background: var(--rs-ink-50);
+}
+
+/* Link-styled button: text only, used for "Skip" and the like. */
+.cachingout-wrap .rs-button--link {
+	padding-right: var(--rs-space-1);
+	padding-left: var(--rs-space-1);
+	color: var(--rs-accent);
+	border-color: transparent;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.cachingout-wrap .rs-button--link:hover,
+.cachingout-wrap .rs-button--link:focus {
+	color: var(--rs-accent-hover);
+	background: transparent;
+	border-color: transparent;
+}
+
+/* Danger: a destructive action. Outline at rest, filled on hover. */
+.cachingout-wrap .rs-button--danger {
+	color: var(--rs-error-700);
+	border-color: var(--rs-error-300);
+}
+
+.cachingout-wrap .rs-button--danger:hover,
+.cachingout-wrap .rs-button--danger:focus {
+	color: var(--rs-paper);
+	background: var(--rs-error-500);
+	border-color: var(--rs-error-500);
+}
+
+.cachingout-wrap .rs-button--sm {
+	min-height: 32px;
+	padding: 0 var(--rs-space-3);
+	font-size: var(--rs-text-sm);
+}
+
+.cachingout-wrap .rs-button--lg {
+	min-height: 48px;
+	padding: 0 var(--rs-space-6);
+	font-size: var(--rs-text-md);
+}
+
+.cachingout-wrap .rs-button--block {
+	display: flex;
+	width: 100%;
+}
+
+/* Icon-only: a square 40 px (or 32 px small) target; always carries an
+   aria-label. */
+.cachingout-wrap .rs-button--icon {
+	width: 40px;
+	padding: 0;
+}
+
+.cachingout-wrap .rs-button--icon.rs-button--sm {
+	width: 32px;
+}
+
+/* Busy: label hidden, spinner shown; width locked by the caller. */
+.cachingout-wrap .rs-button[aria-busy="true"] {
+	position: relative;
+	color: transparent;
+	pointer-events: none;
+}
+
+.cachingout-wrap .rs-button[aria-busy="true"]::after {
+	content: "";
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	border: 2px solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	color: var(--rs-paper);
+	animation: rs-spin 0.7s linear infinite;
+}
+
+.cachingout-wrap .rs-button:not(.rs-button--primary)[aria-busy="true"]::after {
+	color: var(--rs-heading);
+}
+
+@keyframes rs-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* A row of buttons. */
+.rs-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--rs-space-2);
+}
+
+.rs-actions--end {
+	justify-content: flex-end;
+}
+
+/* =======================================
+   10. Alerts, callouts, Pro pointer
+   ======================================= */
+
+.rs-alert {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--rs-space-3);
+	margin: 0 0 var(--rs-space-5);
+	padding: var(--rs-space-4) var(--rs-space-5);
+	border: 1px solid var(--rs-border-strong);
+	border-radius: var(--rs-radius-lg);
+	background: var(--rs-surface-alt);
+	color: var(--rs-ink-700);
+	font-size: var(--rs-text-base);
+}
+
+.rs-alert .rs-alert__icon {
+	flex: none;
+	width: 20px;
+	height: 20px;
+	margin-top: 1px;
+	color: var(--rs-ink-500);
+}
+
+.rs-alert__body {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.rs-alert__body > :last-child {
+	margin-bottom: 0;
+}
+
+.rs-alert__title {
+	display: block;
+	margin-bottom: var(--rs-space-1);
+	font-weight: 600;
+	color: inherit;
+}
+
+.cachingout-wrap .rs-alert__close {
+	flex: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	margin: -6px -8px -6px 0;
+	padding: 0;
+	color: inherit;
+	background: transparent;
+	border: 0;
+	border-radius: var(--rs-radius-md);
+	cursor: pointer;
+	opacity: 0.7;
+}
+
+.cachingout-wrap .rs-alert__close:hover,
+.cachingout-wrap .rs-alert__close:focus {
+	opacity: 1;
+	background: rgba(14, 20, 19, 0.06);
+}
+
+.cachingout-wrap .rs-alert__close .rs-icon {
+	width: 14px;
+	height: 14px;
+}
+
+.rs-alert--info {
+	border-color: var(--rs-signal-200);
+	background: var(--rs-signal-50);
+	color: var(--rs-signal-900);
+}
+
+.rs-alert--info .rs-alert__icon {
+	color: var(--rs-accent);
+}
+
+.rs-alert--success {
+	border-color: var(--rs-signal-300);
+	background: var(--rs-signal-100);
+	color: var(--rs-signal-900);
+}
+
+.rs-alert--success .rs-alert__icon {
+	color: var(--rs-accent);
+}
+
+.rs-alert--warning {
+	border-color: var(--rs-warning-300);
+	background: var(--rs-warning-100);
+	color: var(--rs-warning-700);
+}
+
+.rs-alert--warning .rs-alert__icon {
+	color: var(--rs-warning-500);
+}
+
+.rs-alert--error,
+.rs-alert--danger {
+	border-color: var(--rs-error-300);
+	background: var(--rs-error-100);
+	color: var(--rs-error-700);
+}
+
+.rs-alert--error .rs-alert__icon,
+.rs-alert--danger .rs-alert__icon {
+	color: var(--rs-error-500);
+}
+
+.rs-alert--before {
+	border-color: var(--rs-copper-400);
+	background: var(--rs-copper-100);
+	color: var(--rs-copper-700);
+}
+
+.cachingout-wrap .rs-alert a {
+	color: inherit;
+	font-weight: 600;
+}
+
+/* Callouts: the info box and the note, kept for the views that use them. */
+.rs-info-box,
+.rs-note {
+	margin: var(--rs-space-5) 0;
+	padding: var(--rs-space-4) var(--rs-space-5);
+	border: 1px solid var(--rs-signal-200);
+	border-left-width: 4px;
+	border-radius: var(--rs-radius-md);
+	background: var(--rs-signal-50);
+	color: var(--rs-signal-900);
+	font-size: var(--rs-text-base);
+}
+
+.rs-note {
+	font-size: var(--rs-text-sm);
+}
+
+.rs-info-box p:last-child,
+.rs-note p:last-child,
+.rs-info-box ul:last-child,
+.rs-note ul:last-child {
+	margin-bottom: 0;
+}
+
+.rs-info-box ul,
+.rs-note ul {
+	margin: 0 0 var(--rs-space-2);
+	padding-left: 1.25em;
+	list-style: disc;
+}
+
+.rs-info-box--upgrade {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--rs-space-4);
+}
+
+.rs-info-box .rs-info-box__icon {
+	flex: none;
+	width: 28px;
+	height: 28px;
+	color: var(--rs-accent);
+}
+
+/* The one-sentence Pro pointer (spec 30): the sand panel, no banner. */
+.cachingout-wrap .rs-pro-pointer {
+	margin: var(--rs-space-4) 0 0;
+	padding: var(--rs-space-3) var(--rs-space-4);
+	border: 1px solid var(--rs-sand-deep);
+	border-radius: var(--rs-radius-md);
+	background: var(--rs-sand);
+	color: var(--rs-ink-700);
+	font-size: var(--rs-text-sm);
+}
+
+.cachingout-wrap .rs-pro-pointer strong {
+	color: var(--rs-heading);
+}
+
+/* =======================================
+   11. Chips
+   ======================================= */
+
+.rs-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 3px 10px;
+	border: 1px solid transparent;
+	border-radius: var(--rs-radius-pill);
+	background: var(--rs-ink-100);
+	color: var(--rs-ink-700);
+	font-size: var(--rs-text-xs);
+	font-weight: 600;
+	line-height: 1.4;
+	letter-spacing: 0.02em;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+.rs-chip--outline {
+	background: var(--rs-surface);
+	border-color: var(--rs-border-strong);
+	color: var(--rs-ink-600);
+}
+
+.rs-chip--signal {
+	background: var(--rs-signal-100);
+	color: var(--rs-signal-900);
+}
+
+.rs-chip--copper {
+	background: var(--rs-copper-100);
+	color: var(--rs-copper-700);
+}
+
+.rs-chip--warning {
+	background: var(--rs-warning-100);
+	color: var(--rs-warning-700);
+}
+
+.rs-chip--error {
+	background: var(--rs-error-100);
+	color: var(--rs-error-700);
+}
+
+.rs-chip--mono {
+	font-family: var(--rs-font-mono);
+	font-weight: 500;
+	letter-spacing: 0;
+}
+
+.rs-chip__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: currentColor;
+	opacity: 0.8;
+}
+
+.rs-chip .rs-icon {
+	width: 12px;
+	height: 12px;
+}
+
+/* =======================================
+   12. Tables and lists
+   ======================================= */
+
+.rs-table-wrap {
+	width: 100%;
+	max-width: 100%;
+	overflow-x: auto;
+	border: 1px solid var(--rs-border);
+	border-radius: var(--rs-radius-lg);
+	-webkit-overflow-scrolling: touch;
+}
+
+.cachingout-wrap table.rs-table {
+	width: 100%;
+	margin: 0;
+	border-collapse: collapse;
+	border-spacing: 0;
+	font-size: var(--rs-text-base);
+	background: var(--rs-surface);
+}
+
+.cachingout-wrap .rs-table th,
+.cachingout-wrap .rs-table td {
+	padding: var(--rs-space-3) var(--rs-space-4);
+	text-align: left;
+	vertical-align: middle;
+	border-bottom: 1px solid var(--rs-border);
+}
+
+.cachingout-wrap .rs-table thead th {
+	font-size: var(--rs-text-xs);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--rs-muted);
+	background: var(--rs-surface-alt);
+}
+
+.cachingout-wrap .rs-table tbody tr:last-child th,
+.cachingout-wrap .rs-table tbody tr:last-child td {
+	border-bottom: 0;
+}
+
+.cachingout-wrap .rs-table tbody tr:hover {
+	background: var(--rs-ink-50);
+}
+
+.cachingout-wrap .rs-table--compact th,
+.cachingout-wrap .rs-table--compact td {
+	padding: var(--rs-space-2) var(--rs-space-3);
+	font-size: var(--rs-text-sm);
+}
+
+.cachingout-wrap .rs-table .rs-table__num {
+	font-family: var(--rs-font-mono);
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.cachingout-wrap .rs-table .rs-table__actions {
+	white-space: nowrap;
+	text-align: right;
+}
+
+.cachingout-wrap .rs-table .rs-table__actions .rs-button + .rs-button {
+	margin-left: var(--rs-space-1);
+}
+
+/* Definition list in two columns. */
+.rs-dl {
+	display: grid;
+	grid-template-columns: 160px minmax(0, 1fr);
+	gap: var(--rs-space-2) var(--rs-space-4);
+	margin: 0;
+}
+
+.rs-dl dt {
+	font-weight: 600;
+	color: var(--rs-heading);
+	font-size: var(--rs-text-base);
+}
+
+.rs-dl dd {
+	margin: 0;
+	color: var(--rs-text);
+	font-size: var(--rs-text-base);
+	overflow-wrap: anywhere;
+}
+
+/* Simple list of rows. */
+.rs-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border: 1px solid var(--rs-border);
+	border-radius: var(--rs-radius-lg);
+	background: var(--rs-surface);
+}
+
+.rs-list--flush {
+	border: 0;
+	border-radius: 0;
+}
+
+.rs-list__item {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--rs-space-3);
+	margin: 0;
+	padding: var(--rs-space-3) var(--rs-space-4);
+	border-bottom: 1px solid var(--rs-border);
+}
+
+.rs-list__item:last-child {
+	border-bottom: 0;
+}
+
+.rs-list__item--active {
+	background: var(--rs-accent-subtle);
+}
+
+.rs-list__item > .rs-icon {
+	flex: none;
+	margin-top: 2px;
+	color: var(--rs-accent);
+}
+
+.rs-list__body {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.rs-list__title {
+	font-weight: 600;
+	color: var(--rs-heading);
+}
+
+.rs-list__meta {
+	color: var(--rs-muted);
+	font-size: var(--rs-text-sm);
+}
+
+/* =======================================
+   13. Layout utilities and text
+   ======================================= */
+
+.rs-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--rs-space-4);
+}
+
+@media screen and (min-width: 782px) {
+	.rs-grid--2 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.rs-grid--3 {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.rs-grid--4 {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.rs-grid--sidebar {
+		grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+	}
+}
+
+@media screen and (min-width: 1200px) {
+	.rs-grid--4 {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+.rs-stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--rs-space-4);
+}
+
+.rs-stack--tight {
+	gap: var(--rs-space-2);
+}
+
+.rs-stack--loose {
+	gap: var(--rs-space-6);
+}
+
+.rs-cluster {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--rs-space-2);
+}
+
+.rs-cluster--between {
+	justify-content: space-between;
+}
+
+.rs-cluster--end {
+	justify-content: flex-end;
+}
+
+.rs-cluster--start {
+	align-items: flex-start;
+}
+
+.rs-cluster--loose {
+	gap: var(--rs-space-4);
+}
+
+.rs-cluster--nowrap {
+	flex-wrap: nowrap;
+}
+
+.rs-cluster--center {
+	justify-content: center;
+}
+
+/* Progress bar: the caller sets the bar's inline width and aria values. */
+.rs-progress {
+	width: 100%;
+	height: 8px;
+	overflow: hidden;
+	border-radius: var(--rs-radius-pill);
+	background: var(--rs-ink-100);
+}
+
+.rs-progress__bar {
+	display: block;
+	height: 100%;
+	border-radius: var(--rs-radius-pill);
+	background: var(--rs-accent);
+	transition: width var(--rs-base) var(--rs-ease);
+}
+
+/* Spinner: a 16 px ring in currentColor; pair it with rs-sr-only text. */
+.rs-spinner {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	flex: none;
+	vertical-align: -0.125em;
+	border: 2px solid currentColor;
+	border-right-color: transparent;
+	border-radius: 50%;
+	animation: rs-spin 0.7s linear infinite;
+}
+
+.rs-spinner--lg {
+	width: 28px;
+	height: 28px;
+	border-width: 3px;
+}
+
+.rs-grow {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.rs-shrink-0 {
+	flex: none;
+}
+
+/* Spacing nudges: one axis, one scale, nothing else. */
+.rs-mt-0 { margin-top: 0 !important; }
+.rs-mt-2 { margin-top: var(--rs-space-2) !important; }
+.rs-mt-4 { margin-top: var(--rs-space-4) !important; }
+.rs-mt-6 { margin-top: var(--rs-space-6) !important; }
+.rs-mb-0 { margin-bottom: 0 !important; }
+.rs-mb-2 { margin-bottom: var(--rs-space-2) !important; }
+.rs-mb-4 { margin-bottom: var(--rs-space-4) !important; }
+.rs-mb-6 { margin-bottom: var(--rs-space-6) !important; }
+
+.rs-text--muted { color: var(--rs-muted); }
+.rs-text--small { font-size: var(--rs-text-sm); }
+.rs-text--xs { font-size: var(--rs-text-xs); }
+.rs-text--lead { font-size: var(--rs-text-md); color: var(--rs-muted); max-width: 68ch; }
+.rs-text--semibold { font-weight: 600; }
+.rs-text--normal { font-weight: 400; }
+.cachingout-wrap .rs-link--plain { text-decoration: none; }
+.cachingout-wrap .rs-link--plain:hover,
+.cachingout-wrap .rs-link--plain:focus { text-decoration: underline; }
+.rs-text--heading { color: var(--rs-heading); }
+.rs-text--break { overflow-wrap: anywhere; word-break: break-word; }
+.rs-text--nowrap { white-space: nowrap; }
+.rs-text--center { text-align: center; }
+.rs-text--end { text-align: right; }
+.rs-text--mono { font-family: var(--rs-font-mono); font-variant-numeric: tabular-nums; }
+.rs-text--good { color: var(--rs-accent); }
+.rs-text--warn { color: var(--rs-warning-700); }
+.rs-text--bad { color: var(--rs-error-700); }
+
+.rs-hidden {
+	display: none !important;
+}
+
+/* =======================================
+   14. Icons
+   ======================================= */
+
+.rs-icon {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	flex: none;
+	vertical-align: -0.125em;
+	fill: currentColor;
+}
+
+.rs-icon--lg {
+	width: 20px;
+	height: 20px;
+}
+
+.rs-icon--xl {
+	width: 28px;
+	height: 28px;
+}
+
+.rs-icon--accent {
+	color: var(--rs-accent);
+}
+
+.rs-icon--muted {
+	color: var(--rs-muted);
+}
+
+/* The icon well: a tinted square holding one icon (feature cards). */
+.rs-icon-well {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 40px;
+	height: 40px;
+	border-radius: var(--rs-radius-md);
+	background: var(--rs-accent-subtle);
+	color: var(--rs-accent);
+}
+
+.rs-icon-well .rs-icon {
+	width: 20px;
+	height: 20px;
+}
+
+/* =======================================
+   15. Database, License, Wizard
+   ======================================= */
+
+/* --- Database tab --- */
+
+.rs-database-intro {
+	margin-bottom: var(--rs-space-5);
+	max-width: 78ch;
+	color: var(--rs-muted);
+	font-size: var(--rs-text-base);
+}
+
+.rs-database-actions-top,
+.rs-database-actions-bottom {
+	display: flex;
+	gap: var(--rs-space-2);
+	flex-wrap: wrap;
+	margin: var(--rs-space-4) 0;
+}
+
+.rs-db-desc {
+	margin: 2px 0 0;
+	color: var(--rs-muted);
+	font-size: var(--rs-text-sm);
+}
+
+.rs-db-count-value {
+	font-family: var(--rs-font-mono);
+	font-variant-numeric: tabular-nums;
+	font-weight: 700;
+	font-size: var(--rs-text-md);
+	color: var(--rs-heading);
+}
+
+.rs-db-estimate {
+	display: block;
+	color: var(--rs-muted);
+	font-size: var(--rs-text-xs);
+}
+
+.rs-db-col-action {
+	white-space: nowrap;
+}
+
+.rs-db-schedule-select {
+	max-width: 150px;
+}
+
+.rs-db-results {
+	margin-top: var(--rs-space-6);
+	padding: var(--rs-space-4) var(--rs-space-5);
+	border: 1px solid var(--rs-border);
+	border-radius: var(--rs-radius-md);
+	background: var(--rs-surface-alt);
+}
+
+.rs-db-disclaimer {
+	margin-top: var(--rs-space-4);
+	color: var(--rs-muted);
+	font-size: var(--rs-text-xs);
+}
+
+/* --- License tab --- */
+
+.rs-license__description {
+	margin: 0 0 var(--rs-space-4);
+	max-width: 68ch;
+}
+
+.rs-license__input-row {
+	display: flex;
+	align-items: center;
+	gap: var(--rs-space-2);
+	flex-wrap: wrap;
+	margin-bottom: var(--rs-space-2);
+}
+
+.rs-license__error {
+	margin-top: var(--rs-space-2);
+	color: var(--rs-error-700);
+	font-weight: 600;
+	font-size: var(--rs-text-base);
+}
+
+.rs-license__purchase-link,
+.rs-license__new-key-label {
+	margin-top: var(--rs-space-4);
+	font-size: var(--rs-text-base);
+	color: var(--rs-muted);
+}
+
+.rs-license-active__header,
+.rs-license-expired__header {
+	display: flex;
+	align-items: center;
+	gap: var(--rs-space-4);
+	flex-wrap: wrap;
+	margin-bottom: var(--rs-space-5);
+}
+
+.rs-license-active__key {
+	font-family: var(--rs-font-mono);
+	font-size: var(--rs-text-base);
+	color: var(--rs-muted);
+}
+
+.rs-license-active__details {
+	display: grid;
+	grid-template-columns: 160px 1fr;
+	gap: var(--rs-space-2) var(--rs-space-4);
+	margin: 0 0 var(--rs-space-5);
+}
+
+.rs-license-active__details dt {
+	font-weight: 600;
+	font-size: var(--rs-text-base);
+	color: var(--rs-heading);
+}
+
+.rs-license-active__details dd {
+	margin: 0;
+	color: var(--rs-text);
+	font-size: var(--rs-text-base);
+}
+
+.rs-license-expired__renew {
+	margin: 0 0 var(--rs-space-5);
+}
+
+.cachingout-wrap .rs-license-table th {
+	width: 200px;
+	color: var(--rs-heading);
+	font-weight: 600;
+}
+
+.rs-license-enterprise {
+	margin-top: var(--rs-space-8);
+	padding-top: var(--rs-space-6);
+	border-top: 1px solid var(--rs-border);
+}
+
+/* WordPress's own spinner beside the licence buttons: shown by the
+   script's is-active class, vertically centred in the row. */
+.cachingout-wrap .rs-license-spinner {
+	float: none;
+	margin: 0;
+	vertical-align: middle;
+}
+
+/* --- Setup Wizard --- */
+
+.rs-wizard-wrap {
+	max-width: 860px;
+	margin: var(--rs-space-8) auto var(--rs-space-9);
+}
+
+.rs-wizard-card {
+	padding: var(--rs-space-8);
+	background: var(--rs-surface);
+	border: 1px solid var(--rs-border);
+	border-radius: var(--rs-radius-xl);
+	box-shadow: var(--rs-shadow-sm);
+}
+
+/* The stepper is one non-wrapping row; completed steps show a check,
+   the current and upcoming ones their number. */
+.rs-wizard-progress {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: nowrap;
+	gap: 0;
+	width: 100%;
+	margin-bottom: var(--rs-space-7);
+	padding-bottom: var(--rs-space-1);
+	overflow-x: auto;
+}
+
+.rs-wizard-step {
+	display: flex;
+	align-items: center;
+	flex: 0 0 auto;
+	gap: var(--rs-space-2);
+	min-width: 0;
+}
+
+.rs-wizard-step__number {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 28px;
+	height: 28px;
+	min-width: 28px;
+	min-height: 28px;
+	padding: 0;
+	border-radius: 50%;
+	background: var(--rs-ink-100);
+	color: var(--rs-muted);
+	font-family: var(--rs-font-mono);
+	font-size: var(--rs-text-xs);
+	font-weight: 700;
+	line-height: 1;
+	text-align: center;
+}
+
+.rs-wizard-step__number .rs-icon {
+	width: 14px;
+	height: 14px;
+	vertical-align: 0;
+}
+
+.rs-wizard-step--active .rs-wizard-step__number {
+	background: var(--rs-accent);
+	color: var(--rs-paper);
+}
+
+.rs-wizard-step--completed .rs-wizard-step__number {
+	background: var(--rs-signal-100);
+	color: var(--rs-signal-800);
+}
+
+.rs-wizard-step__label {
+	font-size: var(--rs-text-xs);
+	font-weight: 600;
+	color: var(--rs-muted);
+	white-space: nowrap;
+	line-height: 1.2;
+}
+
+.rs-wizard-step--active .rs-wizard-step__label {
+	color: var(--rs-accent);
+}
+
+.rs-wizard-step--completed .rs-wizard-step__label {
+	color: var(--rs-signal-800);
+}
+
+.rs-wizard-connector {
+	flex: 1 1 12px;
+	min-width: 12px;
+	max-width: 36px;
+	height: 2px;
+	margin: 0 var(--rs-space-2);
+	background: var(--rs-ink-100);
+}
+
+.rs-wizard-connector--completed {
+	background: var(--rs-signal-300);
+}
+
+.rs-wizard-content {
+	margin-bottom: var(--rs-space-7);
+}
+
+.rs-wizard-content h2 {
+	margin: 0 0 var(--rs-space-2);
+	font-size: var(--rs-text-xl);
+	font-weight: 700;
+	letter-spacing: -0.02em;
+}
+
+.rs-wizard-content .rs-text--lead {
+	margin: 0 0 var(--rs-space-6);
+}
+
+.rs-wizard-actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--rs-space-4);
+	padding-top: var(--rs-space-5);
+	border-top: 1px solid var(--rs-border);
+}
+
+.rs-wizard-actions > div {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--rs-space-2);
+}
+
+.rs-wizard-features {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--rs-space-3);
+	margin-bottom: var(--rs-space-6);
+}
+
+.rs-wizard-feature {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--rs-space-3);
+	padding: var(--rs-space-4);
+	background: var(--rs-surface);
+	border: 1px solid var(--rs-border);
+	border-radius: var(--rs-radius-lg);
+}
+
+.rs-wizard-feature__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 40px;
+	height: 40px;
+	border-radius: var(--rs-radius-md);
+	background: var(--rs-accent-subtle);
+	color: var(--rs-accent);
+}
+
+.rs-wizard-feature__icon .rs-icon {
+	width: 20px;
+	height: 20px;
+}
+
+.rs-wizard-feature__text h4 {
+	margin: 0 0 2px;
+	font-size: var(--rs-text-base);
+	font-weight: 600;
+}
+
+.rs-wizard-feature__text p {
+	margin: 0;
+	font-size: var(--rs-text-sm);
+	line-height: 1.45;
+	color: var(--rs-muted);
+}
+
+/* =======================================
+   16. Responsive, motion, forced colours
+   ======================================= */
+
+@media screen and (max-width: 1023px) {
+	.rs-nav {
+		position: static;
+	}
+}
+
+@media screen and (max-width: 782px) {
+	.cachingout-wrap {
+		margin: 12px 10px 32px 0;
+	}
+
+	.rs-header {
+		padding-top: var(--rs-space-3);
+	}
+
+	.rs-field {
+		flex-direction: column;
+		gap: var(--rs-space-2);
+		padding: var(--rs-space-3) 0;
+	}
+
+	.rs-field__label {
+		flex: none;
+		width: 100%;
+		padding-top: 0;
+	}
+
+	.cachingout-wrap input.rs-input--medium,
+	.cachingout-wrap input.rs-input--short,
+	.cachingout-wrap select.rs-select--short {
+		width: 100%;
+	}
+
+	.rs-body,
+	.rs-card__body {
+		padding: var(--rs-space-5);
+	}
+
+	.rs-wizard-card {
+		padding: var(--rs-space-6);
+	}
+
+	.rs-wizard-features {
+		grid-template-columns: 1fr;
+	}
+
+	.rs-license-active__details,
+	.rs-dl {
+		grid-template-columns: 1fr;
+	}
+
+	.rs-wizard-step__label {
+		display: none;
+	}
+
+	.rs-tab-docs {
+		text-align: left;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	.rs-stats {
+		grid-template-columns: 1fr;
+	}
+
+	.cachingout-wrap .rs-button--block-sm {
+		display: flex;
+		width: 100%;
+	}
+}
+
+/* Spec 35 smoke test, 2026-10-24: the three screens that overflowed.
+   An input in a cluster (the import form's file input) may shrink to the
+   line; a long unbreakable token (a constant name in help text) may break;
+   a flex: none cluster of buttons (page-header actions) may wrap at phone
+   width instead of pushing the page sideways. */
+.rs-cluster > .rs-input,
+.rs-cluster > .rs-select {
+	min-width: 0;
+	max-width: 100%;
+}
+
+/* A file input keeps its intrinsic width unless told otherwise, and a
+   long button label is nowrap: inside a field's control column both may
+   fit the column instead (Import/Export at 1024, smoke test 2026-10-24). */
+.cachingout-wrap .rs-field__control input[type="file"].rs-input {
+	width: 100%;
+}
+
+.cachingout-wrap .rs-field__control .rs-button {
+	max-width: 100%;
+	white-space: normal;
+}
+
+.cachingout-wrap .rs-alert__body,
+.cachingout-wrap .rs-help,
+.cachingout-wrap .rs-card__body p {
+	overflow-wrap: anywhere;
+}
+
+@media screen and (max-width: 480px) {
+	.cachingout-wrap .rs-shrink-0 {
+		flex: 0 1 auto;
+		max-width: 100%;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cachingout-wrap *,
+	.cachingout-wrap *::before,
+	.cachingout-wrap *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
+/* Windows High Contrast: background colours are discarded, so the
+   switch's knob and the active nav link need borders that survive. */
+@media (forced-colors: active) {
+	.rs-switch__track {
+		border: 1px solid CanvasText;
+	}
+
+	.rs-switch__track::after {
+		background: CanvasText;
+	}
+
+	.cachingout-wrap .rs-nav__link--active {
+		outline: 1px solid CanvasText;
+	}
+
+	.cachingout-wrap .rs-button {
+		border: 1px solid ButtonText;
+	}
+}

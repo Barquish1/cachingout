@@ -1,0 +1,44 @@
+# Third-party libraries bundled with Caching Out
+
+Caching Out is licensed GPL-2.0-or-later. One third-party work is bundled,
+used in the WordPress admin screens only and never on the front end. Since
+1.22.0 the plugin ships no third-party stylesheet, script, font or minified
+file: Bootstrap 5 and the Bootstrap Icons webfont were removed (spec 35).
+
+| Where | Library | Version | Licence | Upstream source |
+|---|---|---|---|---|
+| `includes/class-icons.php` (the `GLYPHS` array) | Bootstrap Icons, 63 glyphs as SVG path data | 1.13 | MIT | https://github.com/twbs/icons |
+
+## Bootstrap Icons
+
+- Copyright 2019-2024 The Bootstrap Authors
+- Licensed under the MIT licence: https://github.com/twbs/icons/blob/main/LICENSE
+- Project site: https://icons.getbootstrap.com/
+- Source: the SVG files under `icons/` in https://github.com/twbs/icons
+
+`includes/class-icons.php` holds the inner drawing elements (`<path>`,
+`<circle>`, `<rect>`) of 63 icons, copied unchanged from the upstream SVG
+files and rendered inline on a 16x16 viewBox in `currentColor`. The glyph
+names are the upstream file names. No webfont, icon stylesheet or minified
+file ships; the markup is plain and readable in the class itself.
+
+## The rest of the bundle
+
+Everything else under `assets/` (`admin.css`, `admin.js`,
+`admin-insights.css`, `admin-insights.js` and the images) is this project's
+own source, written by hand, shipped unminified and licensed
+GPL-2.0-or-later with the plugin.
+
+Three small front-end scripts of our own are printed inline in the page when
+LazyLoad is on, to save a request each: `assets/js/lazyload-fallback.min.js`,
+`assets/js/lazyload-background.min.js` and `assets/js/lazyload-video.min.js`.
+Their human-readable source, formatted and commented, is beside them in
+`assets/js/src/` under the same names without `.min`. They are
+GPL-2.0-or-later like the rest of the plugin.
+
+PHP dependencies installed with Composer are listed in `composer.json` and
+ship unminified in `vendor/` with their own licence files: matthiasmullie/minify
+(MIT, https://github.com/matthiasmullie/minify) and its dependency
+matthiasmullie/path-converter (MIT,
+https://github.com/matthiasmullie/path-converter). Only production
+dependencies are in the release zip.

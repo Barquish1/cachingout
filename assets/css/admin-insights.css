@@ -1,0 +1,41 @@
+/**
+ * Insights tab styles (free edition).
+ *
+ * Only what the Page Audit needs: the run spinner and the restrained Pro
+ * pointer line. The PageSpeed panel's styles (score badges, tracked-page
+ * table, chart, recommendation cards, opt-in banner) ship with the Pro
+ * add-on as assets/css/admin-insights-pro.css (spec 30).
+ *
+ * @package CachingOut
+ * @since 0.1.0
+ * @since 1.21.0 Page Audit only.
+ */
+
+/* -- Loading spinner ------------------------------------------------- */
+
+.rs-audit-spinner {
+	display: inline-block;
+	width: 1rem;
+	height: 1rem;
+	border: 2px solid var(--rs-border-strong);
+	border-top-color: var(--rs-accent);
+	border-radius: 50%;
+	animation: rs-spin 0.6s linear infinite;
+}
+
+@keyframes rs-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* -- Findings and the Pro pointer ------------------------------------ */
+
+.rs-finding .rs-pro-pointer {
+	margin-bottom: 0;
+	color: var(--rs-ink-600);
+}
+
+.rs-finding .rs-pro-pointer a {
+	white-space: nowrap;
+}
