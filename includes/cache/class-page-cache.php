@@ -57,7 +57,9 @@ class CachingOut_Page_Cache {
 	 * @return void
 	 */
 	public function serve( CachingOut_Cache_Key $key ): void {
-		$file = $key->get_cache_file();
+		// The visitor's image variant when it exists, else the plain file
+		// (spec 36).
+		$file = $key->get_serve_file();
 
 		if ( ! file_exists( $file ) || ! is_readable( $file ) ) {
 			return;
@@ -94,15 +96,26 @@ class CachingOut_Page_Cache {
 		if ( $this->settings->get( 'cache', 'separate_mobile_cache', false ) ) {
 			$vary[] = 'User-Agent';
 		}
-		if ( $this->settings->get( 'media', 'webp_cache_enabled', false ) ) {
+		// The image dimension is on when the site serves a variant (the
+		// derived snapshot list, spec 36); it varies on Accept.
+		$served = $this->settings->get( 'cache', 'image_variants', array() );
+		if ( is_array( $served ) && ! empty( $served ) ) {
 			$vary[] = 'Accept';
 		}
 		header( 'Vary: ' . implode( ', ', $vary ) );
 		header( 'Cache-Control: max-age=0, must-revalidate' );
 
-		// Debug header.
+		// Debug headers.
 		if ( defined( 'CACHINGOUT_DEBUG' ) && CACHINGOUT_DEBUG ) {
 			header( 'X-CachingOut-Cache: HIT' );
+			$name = basename( $file );
+			$kind = 'none';
+			foreach ( CachingOut_Cache_Key::IMAGE_VARIANTS as $variant ) {
+				if ( false !== strpos( $name, '-' . $variant . '.html' ) ) {
+					$kind = $variant;
+				}
+			}
+			header( 'X-CachingOut-Image-Variant: ' . $kind );
 		}
 
 		// Output the cached file and stop.
@@ -182,8 +195,8 @@ class CachingOut_Page_Cache {
 	/**
 	 * Delete all cache variant files for a given key.
 	 *
-	 * Removes every variant file (index.html, index-mobile.html,
-	 * index-webp.html, index-mobile-webp.html) from the key's directory,
+	 * Removes every variant file (CachingOut_Cache_Key::variant_filenames():
+	 * desktop and mobile, plain, WebP and AVIF) from the key's directory,
 	 * then removes empty parent directories up to (but not including)
 	 * the cache root.
 	 *
@@ -434,7 +447,7 @@ class CachingOut_Page_Cache {
 	 */
 	private function delete_html_files( string $dir ): bool {
 		$deleted  = true;
-		$variants = array( 'index.html', 'index-mobile.html', 'index-webp.html', 'index-mobile-webp.html' );
+		$variants = CachingOut_Cache_Key::variant_filenames();
 
 		foreach ( $variants as $filename ) {
 			$file = $dir . DIRECTORY_SEPARATOR . $filename;

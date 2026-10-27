@@ -222,8 +222,8 @@ final class CachingOut_Features {
 		),
 		'webp'                  => array(
 			'edition'  => self::PRO,
-			'label'    => 'WebP serving (where WebP copies already exist)',
-			'settings' => array( 'media.webp_cache_enabled' ),
+			'label'    => 'WebP and AVIF serving (where copies already exist, from any converter)',
+			'settings' => array( 'media.webp_cache_enabled', 'media.avif_cache_enabled' ),
 			'enforced' => 'CachingOut_Pro registers the cache-write hook; the drop-in reads the masked runtime snapshot',
 		),
 		'embeds'                => array(

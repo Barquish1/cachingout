@@ -4,7 +4,8 @@
  * file path.
  *
  * The key includes every dimension the file layout actually stores:
- * host, scheme, path, device class, WebP support, and blog ID (multisite).
+ * host, scheme, path, device class, image variant (AVIF / WebP, spec 36)
+ * and blog ID (multisite).
  * A missing dimension is a cross-user content leak. (The former logical
  * get_key() string with language/currency dimensions was dead code - the
  * filesystem layout never stored them; deleted per TODOS 19.)
@@ -26,6 +27,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 0.1.0
  */
 class CachingOut_Cache_Key {
+
+	/**
+	 * Image variants in preference order (spec 36): a request that accepts
+	 * both is given AVIF. '' is the plain variant (original image URLs).
+	 *
+	 * @since 1.23.0
+	 * @var string[]
+	 */
+	const IMAGE_VARIANTS = array( 'avif', 'webp' );
 
 	/**
 	 * Settings manager.
@@ -88,12 +98,21 @@ class CachingOut_Cache_Key {
 	private $blog_id;
 
 	/**
-	 * Raw Accept header for WebP detection.
+	 * Raw Accept header for image-variant detection.
 	 *
 	 * @since 0.1.0
 	 * @var string
 	 */
 	private $accept_header;
+
+	/**
+	 * A variant set explicitly (with_image_variant() / without_image_variant()),
+	 * or null to derive it from the Accept header and the served list.
+	 *
+	 * @since 1.23.0
+	 * @var string|null
+	 */
+	private $forced_variant = null;
 
 	/**
 	 * Cached device class to avoid recomputation.
@@ -173,36 +192,116 @@ class CachingOut_Cache_Key {
 	}
 
 	/**
-	 * Full filesystem path to the cache file for this request.
+	 * Full filesystem path to the cache file for this key's variant.
 	 *
-	 * Returns the variant-specific HTML file path. The variant suffix depends
-	 * on the device class and WebP support:
-	 *   - index.html           (desktop, no webp)
-	 *   - index-mobile.html    (mobile, no webp)
-	 *   - index-webp.html      (desktop, webp)
-	 *   - index-mobile-webp.html (mobile, webp)
+	 * The file name carries the device class and the image variant:
+	 *   index.html, index-webp.html, index-avif.html (desktop)
+	 *   index-mobile.html, index-mobile-webp.html, index-mobile-avif.html
 	 *
 	 * When separate mobile caching is disabled, all requests use the
-	 * desktop variant ('index.html').
+	 * desktop names. This is the file a WRITE goes to; the serve path uses
+	 * get_serve_file(), which falls back to the plain file.
 	 *
 	 * @since 0.1.0
+	 * @since 1.23.0 AVIF; the variant comes from image_variant().
 	 *
 	 * @return string Absolute path to the cache HTML file.
 	 */
 	public function get_cache_file(): string {
+		return $this->file_for_variant( $this->image_variant() );
+	}
+
+	/**
+	 * The cache file to SERVE for this request.
+	 *
+	 * The visitor's variant file when it exists, otherwise the plain file:
+	 * the plain markup (original image URLs) is correct for every browser,
+	 * and a page none of whose images has a copy never gets a variant file
+	 * (spec 36). The returned path may not exist; the caller checks.
+	 *
+	 * @since 1.23.0
+	 * @return string Absolute path.
+	 */
+	public function get_serve_file(): string {
+		$variant = $this->image_variant();
+		if ( '' !== $variant ) {
+			$file = $this->file_for_variant( $variant );
+			if ( file_exists( $file ) ) {
+				return $file;
+			}
+		}
+		return $this->file_for_variant( '' );
+	}
+
+	/**
+	 * Every cache file name a page can have (purge removes all of them).
+	 *
+	 * @since 1.23.0
+	 * @return string[] Bare file names.
+	 */
+	public static function variant_filenames(): array {
+		$names = array();
+		foreach ( array( '', '-mobile' ) as $device ) {
+			$names[] = 'index' . $device . '.html';
+			foreach ( self::IMAGE_VARIANTS as $variant ) {
+				$names[] = 'index' . $device . '-' . $variant . '.html';
+			}
+		}
+		return $names;
+	}
+
+	/**
+	 * Path of the cache file for one image variant of this key.
+	 *
+	 * @since 1.23.0
+	 *
+	 * @param string $variant '' | 'webp' | 'avif'.
+	 * @return string
+	 */
+	private function file_for_variant( string $variant ): string {
 		$filename = 'index';
 
 		if ( 'mobile' === $this->get_device_class() ) {
 			$filename .= '-mobile';
 		}
 
-		if ( $this->supports_webp() ) {
-			$filename .= '-webp';
+		if ( '' !== $variant ) {
+			$filename .= '-' . $variant;
 		}
 
-		$filename .= '.html';
+		return $this->get_cache_path( $this->blog_id ) . DIRECTORY_SEPARATOR . $filename . '.html';
+	}
 
-		return $this->get_cache_path( $this->blog_id ) . DIRECTORY_SEPARATOR . $filename;
+	/**
+	 * The image variant of this key: '' (original images), 'webp' or 'avif'.
+	 *
+	 * A forced variant wins. Otherwise a format is chosen only when BOTH the
+	 * request's Accept header names it AND the site serves it - the derived
+	 * snapshot list `cache.image_variants`, which the Pro add-on fills
+	 * through `cachingout_image_variants` (CachingOut_Settings::
+	 * image_variants()). With nothing served, every request maps to the one
+	 * plain file. AVIF is preferred over WebP.
+	 *
+	 * @since 1.23.0
+	 * @return string
+	 */
+	public function image_variant(): string {
+		if ( null !== $this->forced_variant ) {
+			return $this->forced_variant;
+		}
+
+		$served = $this->settings->get( 'cache', 'image_variants', array() );
+		if ( ! is_array( $served ) || empty( $served ) ) {
+			return '';
+		}
+
+		foreach ( self::IMAGE_VARIANTS as $variant ) {
+			if ( in_array( $variant, $served, true ) && false !== stripos( $this->accept_header, 'image/' . $variant ) ) {
+				return $variant;
+			}
+		}
+
+		return '';
 	}
 
 	/**
@@ -236,18 +335,20 @@ class CachingOut_Cache_Key {
 	}
 
 	/**
-	 * Whether the current request accepts WebP images.
+	 * Whether this key is the WebP variant.
 	 *
-	 * Detects WebP support by checking the Accept header for 'image/webp'.
-	 * This dimension exists so WebP-variant cache files can be served to
-	 * supporting browsers without a redirect or content-negotiation plugin.
+	 * Kept for the Pro add-on before 1.23.0, which uses it as its recursion
+	 * guard. Since 1.23.0 it is true only when the site serves WebP and the
+	 * request accepts it (or the key was forced to WebP), not whenever the
+	 * Accept header names `image/webp`.
 	 *
 	 * @since 0.1.0
+	 * @since 1.23.0 Delegates to image_variant().
 	 *
 	 * @return bool
 	 */
 	public function supports_webp(): bool {
-		return false !== strpos( $this->accept_header, 'image/webp' );
+		return 'webp' === $this->image_variant();
 	}
 
 
@@ -392,27 +493,59 @@ class CachingOut_Cache_Key {
 	}
 
 	/**
-	 * Create a copy of this key with WebP Accept header set.
+	 * Create a copy of this key forced to the WebP variant.
 	 *
-	 * Used by `CachingOut_WebP` to construct the WebP-variant cache file path
-	 * from the original non-WebP key.
+	 * Kept for the Pro add-on before 1.23.0. The file it names is served
+	 * only when the site's served list includes WebP (image_variant()).
 	 *
 	 * @since 0.1.0
+	 * @since 1.23.0 Forces the variant instead of faking the Accept header.
 	 *
-	 * @return self New key with Accept: image/webp.
+	 * @return self
 	 */
 	public function with_webp_support(): self {
-		return new self(
+		return $this->with_image_variant( 'webp' );
+	}
+
+	/**
+	 * Create a copy of this key forced to one image variant.
+	 *
+	 * The variant producer (Pro) writes its rewritten HTML through such a
+	 * key. An unknown variant is treated as the plain one.
+	 *
+	 * @since 1.23.0
+	 *
+	 * @param string $variant 'webp' | 'avif' | ''.
+	 * @return self
+	 */
+	public function with_image_variant( string $variant ): self {
+		$copy                 = new self(
 			$this->settings,
 			$this->host,
 			$this->is_ssl,
 			$this->path,
 			$this->query_args,
 			$this->is_mobile,
-			'image/webp',
+			$this->accept_header,
 			null, // deprecated language slot
 			$this->blog_id
 		);
+		$copy->forced_variant = in_array( $variant, self::IMAGE_VARIANTS, true ) ? $variant : '';
+		return $copy;
+	}
+
+	/**
+	 * Create a copy of this key forced to the plain variant.
+	 *
+	 * The drop-in writes WordPress's HTML through it: that markup carries the
+	 * original image URLs and belongs in the plain file only, whoever the
+	 * first visitor was (spec 36).
+	 *
+	 * @since 1.23.0
+	 * @return self
+	 */
+	public function without_image_variant(): self {
+		return $this->with_image_variant( '' );
 	}
 
 	/**

@@ -4,7 +4,7 @@ Tags: cache, performance, page cache, lazyload, minify
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.22.0
+Stable tag: 1.23.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,8 +136,8 @@ The free plugin above is complete on its own and stays free. Caching Out Pro is
 a separate add-on, installed alongside it, that adds:
 
 * Optimize CSS delivery, combine CSS and JS, delay JS, Google Fonts (combine
-  and self-host), WebP serving where WebP copies already exist, and YouTube
-  click-to-load
+  and self-host), WebP and AVIF serving where copies already exist, and
+  YouTube click-to-load
 * Unused CSS/JS: stops named plugin files loading on pages that do not need
   them, with a scan, a preview, a dependency check, a never-unload list,
   suggested rules from a built-in catalogue and an optional weekly scan
@@ -259,8 +259,11 @@ configuration by hand.
 
 Deleting the plugin removes its options, its scheduled tasks, its cache
 directory, the drop-in, the `WP_CACHE` constant and its `.htaccess` block.
-Deactivating removes the drop-in and the scheduled tasks only; it never edits
-`.htaccess` or `wp-config.php`.
+There is no separate clean-up step to run first. Deactivating removes the
+drop-in and the scheduled tasks only; it never edits `.htaccess` or
+`wp-config.php`. If another page-cache plugin is active, save its settings
+once after deleting Caching Out so it adds `WP_CACHE` back. Step by step,
+including what to check by hand: https://cachingout.com/docs/getting-started/
 
 = What is the difference between this plugin and Caching Out Pro? =
 
@@ -282,6 +285,12 @@ this plugin.
 5. The Setup Wizard.
 
 == Upgrade Notice ==
+
+= 1.23.0 =
+Fixes WebP images (Caching Out Pro) being missed for most visitors when a
+page was first cached by Chrome, Edge or Firefox, and stops caching every
+page twice by browser type when no image variant is served. The page cache
+is emptied once on update. Update Caching Out Pro to 1.23.0 for AVIF.
 
 = 1.22.0 =
 The settings screens have a new look (Bootstrap is gone; about 440 KB less
@@ -323,6 +332,25 @@ above switched on as they were. Every setting keeps its value and nothing is
 switched on or off by the upgrade.
 
 == Changelog ==
+
+= 1.23.0 =
+* Fixed: the cached copy of a page no longer depends on which browser
+  visited it first. Before, a page first visited by Chrome, Edge or Firefox
+  was cached as that browser's image variant, so with Caching Out Pro most
+  WebP-capable visitors received no WebP images. A page is now always
+  written as the plain copy first, and image variants are made from it.
+* Changed: without Caching Out Pro serving WebP or AVIF, pages are no longer
+  cached twice by browser type (once for browsers that accept WebP and once
+  for the rest). Each page has one cached copy, and the response carries no
+  "Vary: Accept" header. The cache is emptied once on update.
+* New (for Caching Out Pro 1.23.0): an AVIF variant beside the WebP one.
+  With CACHINGOUT_DEBUG on, the X-CachingOut-Image-Variant header names the
+  variant a response was served from.
+* New: "Removing Caching Out completely" in the getting-started guide.
+  Deleting the plugin from the Plugins screen removes everything it added;
+  there is no separate clean-up step.
+* If you use Caching Out Pro, update it to 1.23.0 as well to get AVIF and
+  the new WebP behaviour. Pro 1.22.0 keeps working with this version.
 
 = 1.22.0 =
 * Changed: the plugin's settings screens have a new look, built in-house on

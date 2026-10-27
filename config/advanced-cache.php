@@ -244,7 +244,10 @@ $cachingout_cache_key = new CachingOut_Cache_Key(
 	$cachingout_blog_id
 );
 
-$cachingout_cache_file = $cachingout_cache_key->get_cache_file();
+// The visitor's image variant when it exists, else the plain file (spec 36).
+$cachingout_cache_file = method_exists( $cachingout_cache_key, 'get_serve_file' )
+	? $cachingout_cache_key->get_serve_file()
+	: $cachingout_cache_key->get_cache_file();
 
 // Cache hit path. serve() owns the whole hit sequence: it re-checks
 // existence, deletes an expired file (lifespan is converted from hours by
@@ -367,6 +370,14 @@ ob_start(
 			null, // deprecated language slot - kept so arg order matches stale drop-ins
 			isset( $ctx['blog_id'] ) ? (int) $ctx['blog_id'] : 1
 		);
+
+		// WordPress's HTML carries the original image URLs: it belongs in
+		// the PLAIN file whoever the first visitor was. Variant files are
+		// written from it by the add-on (spec 36). Before 1.23.0 a WebP
+		// browser's first visit stored this markup as the WebP variant.
+		if ( method_exists( $cache_key, 'without_image_variant' ) ) {
+			$cache_key = $cache_key->without_image_variant();
+		}
 
 		// Append the human-verifiable cache signature comment to the cached
 		// copy only (marketing promise: a comment a non-technical user can

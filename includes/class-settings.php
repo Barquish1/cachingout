@@ -505,6 +505,10 @@ class CachingOut_Settings {
 		// to bypass (the Partner Engine's /go/ links, 1.21.16).
 		$settings['cache']['derived_never_cache_prefixes'] = self::derived_never_cache_prefixes();
 
+		// Derived, never stored: the image variants the site serves (spec 36).
+		// Empty without an add-on, so the key never splits by browser.
+		$settings['cache']['image_variants'] = self::image_variants();
+
 		// Derived, never stored: query parameters another plugin asks the
 		// drop-in to ignore, on top of the admin's list (1.21.17).
 		$settings['cache']['derived_ignored_query_strings'] = self::derived_ignored_query_strings();
@@ -590,6 +594,51 @@ class CachingOut_Settings {
 		}
 
 		return array_values( array_unique( $cookies ) );
+	}
+
+	/**
+	 * The image variants the site serves: a subset of 'avif', 'webp'.
+	 *
+	 * Filled through `cachingout_image_variants` (the Pro add-on answers it
+	 * from its WebP and AVIF settings while it is switched on), so the free
+	 * plugin never reads another edition's setting. Exported into the
+	 * runtime snapshot as `cache.image_variants`, where the cache key reads
+	 * it (CachingOut_Cache_Key::image_variant()); never stored in the
+	 * option. Unknown values are dropped; the order is the key's preference
+	 * order. Only ever called with WordPress loaded.
+	 *
+	 * @since 1.23.0
+	 * @return string[]
+	 */
+	public static function image_variants(): array {
+		if ( ! function_exists( 'apply_filters' ) || ! class_exists( 'CachingOut_Cache_Key' ) ) {
+			return array();
+		}
+
+		/**
+		 * Filter the image variants the page cache serves.
+		 *
+		 * Return the formats whose copies a plugin writes into variant cache
+		 * files: any of 'avif', 'webp'. A format listed here makes the page
+		 * cache store a separate copy of each page for browsers that accept
+		 * it; list one only when variant files for it are produced.
+		 *
+		 * @since 1.23.0
+		 *
+		 * @param string[] $variants Default empty.
+		 */
+		$filtered = apply_filters( 'cachingout_image_variants', array() );
+		if ( ! is_array( $filtered ) ) {
+			return array();
+		}
+
+		$variants = array();
+		foreach ( CachingOut_Cache_Key::IMAGE_VARIANTS as $variant ) {
+			if ( in_array( $variant, $filtered, true ) ) {
+				$variants[] = $variant;
+			}
+		}
+		return $variants;
 	}
 
 	/**

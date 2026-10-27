@@ -3,7 +3,7 @@
  * Plugin Name:       Caching Out
  * Plugin URI:        https://cachingout.com/docs/
  * Description:       Page caching, browser caching, compression and lazy loading - on the moment you activate. Never cached for logged-in visitors or carts.
- * Version:           1.22.0
+ * Version:           1.23.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            Caching Out
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * CACHINGOUT_VERSION must match the Version header above and readme.txt's
  * stable tag. The release script enforces this.
  */
-define( 'CACHINGOUT_VERSION', '1.22.0' );
+define( 'CACHINGOUT_VERSION', '1.23.0' );
 
 
 
