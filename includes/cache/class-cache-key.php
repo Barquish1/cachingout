@@ -400,9 +400,32 @@ class CachingOut_Cache_Key {
 		$is_ssl = ( isset( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] )
 			|| ( isset( $_SERVER['SERVER_PORT'] ) && '443' === $_SERVER['SERVER_PORT'] );
 		$scheme = $is_ssl ? 'https' : 'http';
-		$current_url = $scheme . '://' . $host . $uri;
 
-		$sites = isset( $runtime_config['_multisite_sites'] )
+		return self::blog_id_for_url( $scheme . '://' . $host . $uri, $runtime_config );
+	}
+
+	/**
+	 * The blog ID the drop-in files a URL under, from a runtime snapshot.
+	 *
+	 * The matching half of detect_blog_id(), split out (1.24.0) so the purge
+	 * resolves a URL to the SAME site directory the drop-in wrote it to: up
+	 * to 1.23.0 CachingOut_Purge::purge_url() always used blog 1, so on
+	 * multisite every subsite purge deleted nothing. The URL is the raw
+	 * request address, HTTP_HOST (with any port) + REQUEST_URI; the scheme
+	 * is ignored. Single site (no `_multisite` flag): always 1.
+	 *
+	 * @since 1.24.0
+	 *
+	 * @param string $url            Request URL (`scheme://host[:port]/path[?query]`).
+	 * @param array  $runtime_config The runtime settings snapshot.
+	 * @return int Blog ID.
+	 */
+	public static function blog_id_for_url( string $url, array $runtime_config ): int {
+		if ( ! isset( $runtime_config['_multisite'] ) || ! $runtime_config['_multisite'] ) {
+			return 1;
+		}
+
+		$sites = isset( $runtime_config['_multisite_sites'] ) && is_array( $runtime_config['_multisite_sites'] )
 			? $runtime_config['_multisite_sites']
 			: array();
 
@@ -411,7 +434,7 @@ class CachingOut_Cache_Key {
 		// subsite's, so first-match sent every subsite to the main site's
 		// cache directory and settings. Scheme is ignored: a site registered
 		// as http served over https is still that site.
-		$current   = strtolower( preg_replace( '#^https?://#i', '', $current_url ) );
+		$current   = strtolower( preg_replace( '#^https?://#i', '', $url ) );
 		$best_id   = 0;
 		$best_len  = -1;
 		foreach ( $sites as $site ) {

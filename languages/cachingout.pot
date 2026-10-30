@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Caching Out 1.23.0\n"
+"Project-Id-Version: Caching Out 1.25.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/cachingout\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-26T13:55:09+00:00\n"
+"POT-Creation-Date: 2026-10-29T14:27:57+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: cachingout\n"
@@ -837,54 +837,58 @@ msgid "Pro adds"
 msgstr ""
 
 #: admin/views/view-pro.php:87
-msgid "Optimize CSS delivery, combine CSS and JS, delay JS, Google Fonts (combine and self-host), WebP serving where WebP copies already exist, YouTube click-to-load"
+msgid "Optimize CSS delivery, combine CSS and JS, delay JS, Google Fonts (combine and self-host), WebP and AVIF serving where copies already exist, YouTube click-to-load"
 msgstr ""
 
 #: admin/views/view-pro.php:88
-msgid "Unused CSS/JS: stop named plugin files loading on pages that do not need them, with a scan, a preview, a dependency check, a never-unload list, suggested rules from the built-in catalogue and an optional weekly scan"
+msgid "Image compression: pick an image from the Page Audit or the Media Library, see it before and after, and keep the smaller file at the same address. One image at a time, on your own server, always restorable"
 msgstr ""
 
 #: admin/views/view-pro.php:89
-msgid "Activity: a record of every change the plugin makes, with one-click revert"
+msgid "Unused CSS/JS: stop named plugin files loading on pages that do not need them, with a scan, a preview, a dependency check, a never-unload list, suggested rules from the built-in catalogue and an optional weekly scan"
 msgstr ""
 
 #: admin/views/view-pro.php:90
-msgid "Performance Insights: a PageSpeed dial, a baseline, re-tests and history"
+msgid "Activity: a record of every change the plugin makes, with one-click revert"
 msgstr ""
 
 #: admin/views/view-pro.php:91
-msgid "Cache preloading, a step you switch on"
+msgid "Performance Insights: a PageSpeed dial, a baseline, re-tests and history"
 msgstr ""
 
 #: admin/views/view-pro.php:92
-msgid "Custom exclusion rules by URL, cookie and user agent"
+msgid "Cache preloading, a step you switch on"
 msgstr ""
 
 #: admin/views/view-pro.php:93
-msgid "Database: scheduled cleanup, orphaned metadata, table optimisation"
+msgid "Custom exclusion rules by URL, cookie and user agent"
 msgstr ""
 
 #: admin/views/view-pro.php:94
-msgid "CDN rewriting; Cloudflare, Varnish and Sucuri purge add-ons"
+msgid "Database: scheduled cleanup, orphaned metadata, table optimisation"
 msgstr ""
 
 #: admin/views/view-pro.php:95
+msgid "CDN rewriting; Cloudflare, Varnish and Sucuri purge add-ons"
+msgstr ""
+
+#: admin/views/view-pro.php:96
 msgid "WP-CLI commands; settings export and import; Multisite Network Admin"
 msgstr ""
 
-#: admin/views/view-pro.php:98
+#: admin/views/view-pro.php:99
 msgid "Email support from the team who built it - plus an assistant that already knows your setup. It knows which plugins you run, which settings you have on and what the Page Audit found, so you never have to explain your site before asking a question. Every answer points at the documentation or the rule it came from."
 msgstr ""
 
-#: admin/views/view-pro.php:99
+#: admin/views/view-pro.php:100
 msgid "The assistant is scoped to Caching Out and your site's configuration: 50 questions a day and 300 a month per licence. It is not a general-purpose chatbot; answers are AI-generated and can be wrong, so check anything consequential against the linked source."
 msgstr ""
 
-#: admin/views/view-pro.php:109
+#: admin/views/view-pro.php:110
 msgid "In both editions, anything that can change how a page looks stays off until you switch it on."
 msgstr ""
 
-#: admin/views/view-pro.php:111
+#: admin/views/view-pro.php:112
 msgid "Pro comes with a 14-day money-back guarantee."
 msgstr ""
 
@@ -1115,19 +1119,19 @@ msgstr ""
 msgid "Every %d seconds (Caching Out expiry)"
 msgstr ""
 
-#: includes/cache/class-purge.php:479
+#: includes/cache/class-purge.php:610
 msgid "You do not have permission to perform this action."
 msgstr ""
 
-#: includes/cache/class-purge.php:480
+#: includes/cache/class-purge.php:611
 msgid "Permission Denied"
 msgstr ""
 
-#: includes/cache/class-purge.php:489
+#: includes/cache/class-purge.php:620
 msgid "The link you followed has expired. Please try again."
 msgstr ""
 
-#: includes/cache/class-purge.php:490
+#: includes/cache/class-purge.php:621
 msgid "Invalid Request"
 msgstr ""
 
@@ -1684,471 +1688,474 @@ msgstr ""
 msgid "Response body was under 1 KB."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:454
+#: includes/insights/class-page-audit.php:480
 msgid "No large early image to prioritise"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:454
+#: includes/insights/class-page-audit.php:480
 msgid "This page has no obvious hero image, so there is nothing to hint."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:462
+#: includes/insights/class-page-audit.php:488
 msgid "Hero image is prioritised"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:464
+#: includes/insights/class-page-audit.php:490
 msgid "The likely Largest Contentful Paint image carries fetchpriority=\"high\" and a preload hint."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:465
+#: includes/insights/class-page-audit.php:491
 msgid "The likely Largest Contentful Paint image carries fetchpriority=\"high\"."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:474
+#: includes/insights/class-page-audit.php:500
 msgid "Hero image has no priority hint"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:475
+#: includes/insights/class-page-audit.php:501
 msgid "The image most likely to be your Largest Contentful Paint is fetched at normal priority, behind stylesheets, fonts and scripts. A fetchpriority=\"high\" attribute plus a preload hint moves it to the front of the queue."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:476
+#: includes/insights/class-page-audit.php:502
 msgid "LCP Image Priority is on but did not hint this image — it may be excluded, inside <noscript>, or lazy-loaded by the theme. Ask your theme developer to add fetchpriority=\"high\" to it, or adjust the \"Never prioritise\" list."
 msgstr ""
 
 #. translators: %s: size such as "86 KB"
-#: includes/insights/class-page-audit.php:487
+#: includes/insights/class-page-audit.php:513
 msgid "Hero image weighs %s"
 msgstr ""
 
-#. translators: %s: size such as "86 KB"
-#: includes/insights/class-page-audit.php:488
+#: includes/insights/class-page-audit.php:537
 msgid "The likely Largest Contentful Paint image is heavier than it needs to be, and its download time lands directly in your LCP. Re-export it at a lower quality (WebP or AVIF at quality 60-75 is usually indistinguishable) and serve a smaller variant to phones through srcset. Aim for under 50 KB above the fold."
 msgstr ""
 
+#: includes/insights/class-page-audit.php:541
+msgid "Caching Out Pro can compress this image for you, on your own server, with a one-click restore."
+msgstr ""
+
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:550
+#: includes/insights/class-page-audit.php:599
 msgid "%d image below the fold loads immediately"
 msgid_plural "%d images below the fold load immediately"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:551
+#: includes/insights/class-page-audit.php:600
 msgid "Images the visitor cannot see yet compete with the hero image and stylesheets for bandwidth. Lazy loading defers them until they are about to scroll into view."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:552
+#: includes/insights/class-page-audit.php:601
 msgid "LazyLoad is on but these images were not deferred — they are probably in the exclusion list or above the configured above-the-fold count."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:556
+#: includes/insights/class-page-audit.php:605
 msgid "Below-the-fold images are lazy-loaded"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:556
+#: includes/insights/class-page-audit.php:605
 msgid "Every image after the first three is deferred until needed."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:562
+#: includes/insights/class-page-audit.php:611
 msgid "%d below-the-fold image is marked loading=\"eager\" by the theme"
 msgid_plural "%d below-the-fold images are marked loading=\"eager\" by the theme"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:563
+#: includes/insights/class-page-audit.php:612
 msgid "The theme explicitly forces these to load immediately, so the plugin leaves them alone. If they are not visible on first paint, ask your theme developer to change loading=\"eager\" to loading=\"lazy\" on them."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:585
+#: includes/insights/class-page-audit.php:634
 msgid "All images declare their size"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:585
+#: includes/insights/class-page-audit.php:634
 msgid "Width and height attributes let the browser reserve space, avoiding layout shift."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:591
+#: includes/insights/class-page-audit.php:640
 msgid "%d image has no width/height"
 msgid_plural "%d images have no width/height"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:592
+#: includes/insights/class-page-audit.php:641
 msgid "Without dimensions the page jumps as each image arrives (Cumulative Layout Shift). The plugin can read each local image once and add the attributes."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:593
+#: includes/insights/class-page-audit.php:642
 msgid "Automatic dimensions are on but these images could not be measured — they are remote, dynamic, or excluded. Add width and height attributes in the theme or the image block."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:612
+#: includes/insights/class-page-audit.php:661
 msgid "Videos load only when seen"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:612
+#: includes/insights/class-page-audit.php:661
 msgid "Video sources are deferred until they scroll into view and paused when scrolled away."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:618
+#: includes/insights/class-page-audit.php:667
 msgid "%d video downloads before it is seen"
 msgid_plural "%d videos download before they are seen"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:619
+#: includes/insights/class-page-audit.php:668
 msgid "A video source is often the heaviest request on a page. Deferring it until the player is near the viewport — and pausing it when scrolled away — saves that bandwidth for the content the visitor is looking at."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:620
+#: includes/insights/class-page-audit.php:669
 msgid "LazyLoad Videos is on but these were not deferred — they are excluded (pattern or data-no-lazy)."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:636
+#: includes/insights/class-page-audit.php:685
 msgid "%d YouTube player loads on every visit"
 msgid_plural "%d YouTube players load on every visit"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:637
+#: includes/insights/class-page-audit.php:686
 msgid "A YouTube iframe pulls in roughly 500 KB of player code whether or not anyone presses play. A thumbnail facade loads the real player only on click."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:638
+#: includes/insights/class-page-audit.php:687
 msgid "The embed facade is on but these players were not replaced — the markup is not a standard youtube.com/embed iframe."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:678
+#: includes/insights/class-page-audit.php:727
 msgid "%d stylesheet is loaded more than once"
 msgid_plural "%d stylesheets are loaded more than once"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:679
+#: includes/insights/class-page-audit.php:728
 msgid "The same stylesheet URL appears several times on the page (usually once with and once without a ?ver= query), so the browser downloads and parses it every time, and each copy blocks rendering. Ask your theme or plugin developer to enqueue it once."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:696
+#: includes/insights/class-page-audit.php:745
 msgid "%d stylesheet is served unminified"
 msgid_plural "%d stylesheets are served unminified"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:697
+#: includes/insights/class-page-audit.php:746
 msgid "Minify CSS serves one consolidated, whitespace-stripped copy of each local stylesheet (folding in @imports) from the cache folder, so the browser downloads less before it can paint."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:698
+#: includes/insights/class-page-audit.php:747
 msgid "Minify CSS is on but these stylesheets were not rewritten — they are excluded, cross-origin, or generated after the page cache."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:702
+#: includes/insights/class-page-audit.php:751
 msgid "Stylesheets are minified"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:702
+#: includes/insights/class-page-audit.php:751
 msgid "Local stylesheets are served as minified copies."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:709
+#: includes/insights/class-page-audit.php:758
 msgid "%d render-blocking stylesheets on one page"
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:710
+#: includes/insights/class-page-audit.php:759
 msgid "Each stylesheet is a separate round-trip the browser must finish before painting. On HTTP/1.1 hosts, combining consecutive local stylesheets into one file cuts that queue."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:711
+#: includes/insights/class-page-audit.php:760
 msgid "Combine CSS is on but the sheets could not be merged — different media attributes or excluded files break the run. On an HTTP/2 host this is less important."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:764
+#: includes/insights/class-page-audit.php:813
 msgid "Scripts are minified"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:764
+#: includes/insights/class-page-audit.php:813
 msgid "Local scripts are served as minified copies."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:770
+#: includes/insights/class-page-audit.php:819
 msgid "%d script is served unminified"
 msgid_plural "%d scripts are served unminified"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:771
+#: includes/insights/class-page-audit.php:820
 msgid "Minify JavaScript serves a whitespace-stripped copy of each local script from the cache folder; defer/async attributes are preserved."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:772
+#: includes/insights/class-page-audit.php:821
 msgid "Minify JavaScript is on but these scripts were not rewritten — they are excluded, already minified, or contain document.write."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:807
+#: includes/insights/class-page-audit.php:856
 msgid "Google Analytics is loaded more than once"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:808
+#: includes/insights/class-page-audit.php:857
 msgid "Both a Tag Manager container (gtm.js) and a direct gtag loader are on the page — typically Site Kit and GTM both configured for GA4. Each is ~170 KB of JavaScript. Keep one: manage tags in GTM and turn off Analytics in Site Kit, or the reverse."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:817
+#: includes/insights/class-page-audit.php:866
 msgid "%d analytics script loads before the page is interactive"
 msgid_plural "%d analytics scripts load before the page is interactive"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:818
+#: includes/insights/class-page-audit.php:867
 msgid "Tag-manager and analytics loaders are large and not needed for first paint. Delaying them until the first interaction (or a timeout) keeps them out of the critical path — the trade-off is that visits shorter than the timeout may not be recorded."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:819
+#: includes/insights/class-page-audit.php:868
 msgid "Delay analytics is on but this loader was not delayed — it is in your exclusion list."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:823
+#: includes/insights/class-page-audit.php:872
 msgid "Analytics scripts are delayed"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:823
+#: includes/insights/class-page-audit.php:872
 msgid "Tag loaders wait for the first interaction or the timeout."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:838
+#: includes/insights/class-page-audit.php:887
 msgid "Tag Manager is injected by an inline snippet"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:839
+#: includes/insights/class-page-audit.php:888
 msgid "The standard GTM snippet creates its script tag from inline code, which Delay JavaScript cannot intercept. If you want the container delayed, load it through a plugin that outputs a normal <script src> tag (e.g. Site Kit) instead of the pasted snippet."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:872
+#: includes/insights/class-page-audit.php:921
 msgid "%d slider stylesheet is deferred and will shift the page"
 msgid_plural "%d slider stylesheets are deferred and will shift the page"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:873
+#: includes/insights/class-page-audit.php:922
 msgid "A slider or carousel stylesheet is loaded asynchronously (preload, then swapped in). Until it applies, the slides render as ordinary stacked blocks, then collapse into the slider - a large layout shift that Lighthouse scores heavily, and one that comes and goes between runs. Caching Out keeps the well-known slider stylesheets render-blocking automatically; this one is not on that list. Add its file name to File Optimization > \"Excluded CSS\" so Optimize CSS delivery leaves it alone."
 msgstr ""
 
 #. translators: %s: stylesheet file name
-#: includes/insights/class-page-audit.php:944
+#: includes/insights/class-page-audit.php:993
 msgid "%s is deferred but lays out the top of this page"
 msgstr ""
 
 #. translators: %s: stylesheet file name
-#: includes/insights/class-page-audit.php:945
+#: includes/insights/class-page-audit.php:994
 msgid "This stylesheet is loaded asynchronously (preload, then swapped in), yet it holds the layout rules for elements that are visible before the first paint - listed below - and the inline critical CSS does not. The page renders without them and moves when the file arrives: a large layout shift. Optimize CSS delivery normally keeps such a stylesheet render-blocking on its own; this one slipped through (the coverage guard may be switched off by a filter, or the page was cached by an older version). Click \"Keep it render-blocking\" to add the file name to File Optimization > Excluded CSS; the change is recorded on the Activity page and can be reverted there. Purge the cache afterwards."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:951
+#: includes/insights/class-page-audit.php:1000
 msgid "Keep it render-blocking"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1006
+#: includes/insights/class-page-audit.php:1055
 msgid "theme stylesheet"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1007
+#: includes/insights/class-page-audit.php:1056
 msgid "on the built-in layout-critical list"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1008
+#: includes/insights/class-page-audit.php:1057
 msgid "listed in Excluded CSS"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1009
+#: includes/insights/class-page-audit.php:1058
 msgid "lays out visible elements the inline CSS does not cover"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1010
+#: includes/insights/class-page-audit.php:1059
 msgid "could not be parsed, kept to be safe"
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:1024
+#: includes/insights/class-page-audit.php:1073
 msgid "%d stylesheet is kept render-blocking because it lays out the top of the page"
 msgid_plural "%d stylesheets are kept render-blocking because they lay out the top of the page"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:1025
+#: includes/insights/class-page-audit.php:1074
 msgid "Optimize CSS delivery left these stylesheets render-blocking on purpose: the active theme's stylesheet, and any stylesheet whose rules lay out elements visible before the first paint that the inline critical CSS does not cover. Deferring them would make the page move as they arrive. Nothing to do. If you want one deferred anyway, the filters cachingout_critical_css_theme_protected and cachingout_critical_css_coverage_guard override the decision, at the cost of a layout shift."
 msgstr ""
 
 #. translators: 1: count, 2: size such as "48 KB"
-#: includes/insights/class-page-audit.php:1085
+#: includes/insights/class-page-audit.php:1134
 msgid "%1$d plugin file loads on this page but nothing on it uses it (%2$s)"
 msgid_plural "%1$d plugin files load on this page but nothing on it uses them (%2$s)"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:1086
+#: includes/insights/class-page-audit.php:1135
 msgid "%d plugin file loads on this page but nothing on it uses it"
 msgid_plural "%d plugin files load on this page but nothing on it uses them"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:1087
+#: includes/insights/class-page-audit.php:1136
 msgid "WordPress plugins load their CSS and JavaScript on every page by default. On this page, the listed files come from plugins whose markup does not appear here, so the requests are typically wasted. The Unused CSS/JS tab under File Optimization lets you add a rule that stops a file from loading on pages that do not use it, with a dependency check and a preview before it is saved. This is one sampled page: check that the plugin is really unused on the pages a rule would cover."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1158
+#: includes/insights/class-page-audit.php:1207
 msgid "Delayed libraries have no undelayed inline initialisers"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1159
+#: includes/insights/class-page-audit.php:1208
 msgid "Every library Delay JavaScript holds back is initialised by code that is delayed with it."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:1166
+#: includes/insights/class-page-audit.php:1215
 msgid "%d delayed library is initialised by an inline script that is not delayed"
 msgid_plural "%d delayed libraries are initialised by inline scripts that are not delayed"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:1167
+#: includes/insights/class-page-audit.php:1216
 msgid "Delay JavaScript holds these libraries back until the visitor interacts, but an inline script on the page uses them at DOMContentLoaded - so the feature they power (a carousel, an animation, a lightbox) is dead until then. Either add the library to the \"Delay JavaScript\" exclusions so it loads normally, or, better, move the inline initialiser into an enqueued .js file that depends on the library: both are then delayed together and replayed in order."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:1211
+#: includes/insights/class-page-audit.php:1260
 msgid "%d video is excluded from LazyLoad and started by an inline play() call"
 msgid_plural "%d videos are excluded from LazyLoad and started by an inline play() call"
 msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:1212
+#: includes/insights/class-page-audit.php:1261
 msgid "The video carries data-no-lazy so the theme's own play() call keeps working - but an explicit play() forces the whole file to download during page load, even with preload=\"none\". Remove data-no-lazy and put the autoplay attribute on the <video> instead: LazyLoad Videos turns autoplay into a deferred, muted start when the player scrolls into view, so the theme keeps its behaviour and the file leaves the critical path."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:1242
+#: includes/insights/class-page-audit.php:1291
 msgid "%d leftover from a removed cache plugin"
 msgid_plural "%d leftovers from removed cache plugins"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/insights/class-page-audit.php:1244
+#: includes/insights/class-page-audit.php:1293
 msgid "A previous caching plugin is gone but an .htaccess block of its rules is still in place, so Apache keeps applying them and Caching Out will not write its own browser-caching rules until it is removed. The Filesystem Check page lists every leftover with its exact path and whether it is safe to delete. Caching Out never deletes another plugin's files."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1245
+#: includes/insights/class-page-audit.php:1294
 msgid "A previous caching plugin left folders, files or empty .htaccess markers behind. None of it is active; the Filesystem Check page lists each one with its exact path so you can delete it with your file manager. Caching Out never deletes another plugin's files."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1326
+#: includes/insights/class-page-audit.php:1375
 msgid "Pages are compressed"
 msgstr ""
 
 #. translators: %s: encoding
-#: includes/insights/class-page-audit.php:1326
+#: includes/insights/class-page-audit.php:1375
 msgid "The HTML is served with %s compression."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1332
+#: includes/insights/class-page-audit.php:1381
 msgid "Pages are not compressed"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1333
+#: includes/insights/class-page-audit.php:1382
 msgid "The HTML arrived without gzip or Brotli encoding — typically 4–5× more bytes than necessary on every page view. Browser Caching writes the compression and cache-header rules to .htaccess."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1334
+#: includes/insights/class-page-audit.php:1383
 msgid "Browser Caching is on but the response is still uncompressed — the server may not run Apache mod_deflate/mod_brotli (NGINX needs the equivalent in its config), or a proxy strips the header. Ask your host to enable compression."
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:1354
+#: includes/insights/class-page-audit.php:1403
 msgid "%d fonts are preloaded"
 msgstr ""
 
 #. translators: %d: count
-#: includes/insights/class-page-audit.php:1355
+#: includes/insights/class-page-audit.php:1404
 msgid "Every preloaded font competes with the hero image and stylesheets at high priority. Preload only the one or two weights used above the fold; let the rest load normally with font-display: swap."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1394
+#: includes/insights/class-page-audit.php:1443
 msgid "This page starts a PHP session for every visitor"
 msgstr ""
 
 #. translators: %s: cookie name such as PHPSESSID
-#: includes/insights/class-page-audit.php:1397
+#: includes/insights/class-page-audit.php:1446
 msgid "The response sets a %s cookie, so a plugin or theme calls session_start() on the front end. A session ties a page to one visitor, so Caching Out never stores it and serves that visitor live from then on: this page has no page cache while that continues. Find the plugin that starts the session (deactivate plugins one at a time, or search their code for session_start) and ask its author to limit the session to the pages that need it, for example checkout. The debug header shows BYPASS:session-cookie for these visitors."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1406
+#: includes/insights/class-page-audit.php:1455
 msgid "Page is served from the page cache"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1406
+#: includes/insights/class-page-audit.php:1455
 msgid "The static copy skips PHP and the database on every visit."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1412
+#: includes/insights/class-page-audit.php:1461
 msgid "Page is not served from the page cache"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1413
+#: includes/insights/class-page-audit.php:1462
 msgid "Every visit runs PHP and the database. The page cache stores a static copy after the first visit."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1414
+#: includes/insights/class-page-audit.php:1463
 msgid "The page cache is on but this page was generated live — it is excluded by a rule (query string, cookie, logged-in, or a plugin conflict), or the cache was just purged. Run the audit again after visiting the page once."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1475
+#: includes/insights/class-page-audit.php:1524
 msgid "Static files carry long cache headers"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1475
+#: includes/insights/class-page-audit.php:1524
 msgid "Repeat visitors reuse stylesheets, scripts, images and fonts from their browser cache."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1481
+#: includes/insights/class-page-audit.php:1530
 msgid "Static files have no long-lived cache headers"
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1482
+#: includes/insights/class-page-audit.php:1531
 msgid "Without an Expires / Cache-Control header, every visit re-downloads stylesheets, scripts, images and fonts. Browser Caching writes far-future headers for static file types."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1483
+#: includes/insights/class-page-audit.php:1532
 msgid "Browser Caching is on but the stylesheet was served without a long max-age — the server may ignore .htaccess (NGINX) or a CDN/proxy overrides it. Ask your host to set far-future cache headers for static files."
 msgstr ""
 
-#: includes/insights/class-page-audit.php:1549
+#: includes/insights/class-page-audit.php:1598
 msgid "The page could not be fetched for auditing"
 msgstr ""
 
 #. translators: %s: reason
-#: includes/insights/class-page-audit.php:1550
+#: includes/insights/class-page-audit.php:1599
 msgid "Reason: %s. Some hosts block a site from requesting itself; the PageSpeed audit still works. Try again later or check the URL."
 msgstr ""

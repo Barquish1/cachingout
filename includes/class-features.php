@@ -310,6 +310,12 @@ final class CachingOut_Features {
 			'settings' => array(),
 			'enforced' => 'CachingOut_Pro adds the wizard step and its AJAX handler',
 		),
+		'image_compression'     => array(
+			'edition'  => self::PRO,
+			'label'    => 'Image compression: optimised originals with restore, one image at a time',
+			'settings' => array(),
+			'enforced' => 'Registered always: Compress / Preview and the audit link are gated inside the handlers; Restore and attachment clean-up stay available without a licence so a backup is never stranded (spec 38).',
+		),
 	);
 
 	/**

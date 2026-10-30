@@ -84,7 +84,8 @@ $cachingout_pro_on        = class_exists( 'CachingOut_Features' ) && CachingOut_
 		<div class="rs-card rs-card--raised rs-card--full">
 			<div class="rs-card__header"><h3 class="rs-card__title"><?php esc_html_e( 'Pro adds', 'cachingout' ); ?></h3></div>
 			<ul class="rs-list rs-list--flush">
-				<li class="rs-list__item"><?php esc_html_e( 'Optimize CSS delivery, combine CSS and JS, delay JS, Google Fonts (combine and self-host), WebP serving where WebP copies already exist, YouTube click-to-load', 'cachingout' ); ?></li>
+				<li class="rs-list__item"><?php esc_html_e( 'Optimize CSS delivery, combine CSS and JS, delay JS, Google Fonts (combine and self-host), WebP and AVIF serving where copies already exist, YouTube click-to-load', 'cachingout' ); ?></li>
+				<li class="rs-list__item"><?php esc_html_e( 'Image compression: pick an image from the Page Audit or the Media Library, see it before and after, and keep the smaller file at the same address. One image at a time, on your own server, always restorable', 'cachingout' ); ?></li>
 				<li class="rs-list__item"><?php esc_html_e( 'Unused CSS/JS: stop named plugin files loading on pages that do not need them, with a scan, a preview, a dependency check, a never-unload list, suggested rules from the built-in catalogue and an optional weekly scan', 'cachingout' ); ?></li>
 				<li class="rs-list__item"><?php esc_html_e( 'Activity: a record of every change the plugin makes, with one-click revert', 'cachingout' ); ?></li>
 				<li class="rs-list__item"><?php esc_html_e( 'Performance Insights: a PageSpeed dial, a baseline, re-tests and history', 'cachingout' ); ?></li>

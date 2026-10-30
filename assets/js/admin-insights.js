@@ -146,7 +146,12 @@
 			if ( status === 'fix' && f.fix_id ) {
 				html += '<button type="button" class="rs-button rs-button--primary rs-button--sm rs-apply-fix" data-fix="' + escAttr( f.fix_id ) + '" title="' + escAttr( f.fix_label || '' ) + '">' + rsIcon( 'magic' ) + ' Fix</button>';
 			}
-			if ( f.action && f.action.id ) {
+			if ( f.action && f.action.id && f.action.url ) {
+				// Spec 38: a link action opens an admin screen of this site
+				// (the server keeps only such URLs); no AJAX apply.
+				// data-action-id lets an add-on enhance its own link (1.25.0).
+				html += '<a class="rs-button rs-button--primary rs-button--sm rs-action-link" data-action-id="' + escAttr( f.action.id ) + '" href="' + escAttr( f.action.url ) + '">' + rsIcon( 'magic' ) + ' ' + escHtml( f.action.label || 'Open' ) + '</a>';
+			} else if ( f.action && f.action.id ) {
 				html += '<button type="button" class="rs-button rs-button--primary rs-button--sm rs-apply-action" data-action="' + escAttr( f.action.id ) + '" data-value="' + escAttr( f.action.value || '' ) + '">' + rsIcon( 'shield-check' ) + ' ' + escHtml( f.action.label || 'Apply' ) + '</button>';
 			}
 		}
@@ -211,7 +216,11 @@
 		order.forEach( function ( key ) {
 			var g = grouped[ key ];
 			var card = renderFinding( g.finding, g.pages );
-			( g.finding.status === 'fix' ? fixes : ( g.finding.status === 'advice' ? advice : passes ) ).push( card );
+			// An advice finding that carries an action is fixable inside the
+			// plugin (1.25.0): it is listed with the fixes, not under "Outside
+			// the plugin" - unless that action needs Pro and Pro is not here.
+			var actionable = g.finding.status === 'advice' && g.finding.action && g.finding.action.id && ! ( g.finding.feature && proUnavailable[ g.finding.feature ] );
+			( g.finding.status === 'fix' || actionable ? fixes : ( g.finding.status === 'advice' ? advice : passes ) ).push( card );
 		} );
 
 		var html = '';

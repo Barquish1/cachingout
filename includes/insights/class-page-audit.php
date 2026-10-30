@@ -431,6 +431,32 @@ class CachingOut_Page_Audit {
 			}
 		}
 
+		/**
+		 * Filter the Page Audit findings after every check has run (spec 38).
+		 *
+		 * Lets an add-on add a finding, or amend one (for example attach a
+		 * link action to `lcp-image-weight`). Each returned entry is
+		 * normalised again exactly like a built-in finding, so a malformed
+		 * status, severity or action cannot reach the view; entries that are
+		 * not arrays or carry no `id` are dropped; a non-array result keeps the
+		 * findings as they were.
+		 *
+		 * @since 1.24.0
+		 *
+		 * @param array[] $findings Normalised findings, unsorted.
+		 * @param string  $url      The audited URL.
+		 */
+		$filtered = apply_filters( 'cachingout_page_audit_findings', $findings, $url );
+		if ( ! is_array( $filtered ) ) {
+			$filtered = $findings; // A broken callback never wipes the audit.
+		}
+		$findings = array();
+		foreach ( $filtered as $finding ) {
+			if ( is_array( $finding ) && isset( $finding['id'] ) ) {
+				$findings[] = $this->normalise_finding( $finding );
+			}
+		}
+
 		$findings = $this->sort_findings( $findings );
 
 		return array(
@@ -481,15 +507,38 @@ class CachingOut_Page_Audit {
 		// Weight: a priority hint cannot shorten the download itself.
 		$bytes = $this->local_image_bytes( $candidate['src'] );
 		if ( $bytes > self::LCP_IMAGE_MAX_BYTES ) {
-			$out[] = $this->advice(
+			$weight = $this->advice(
 				'lcp-image-weight',
 				'medium',
 				sprintf( /* translators: %s: size such as "86 KB" */ __( 'Hero image weighs %s', 'cachingout' ), size_format( $bytes ) ),
-				__( 'The likely Largest Contentful Paint image is heavier than it needs to be, and its download time lands directly in your LCP. Re-export it at a lower quality (WebP or AVIF at quality 60-75 is usually indistinguishable) and serve a smaller variant to phones through srcset. Aim for under 50 KB above the fold.', 'cachingout' ),
+				$this->lcp_weight_detail(),
 				array( $this->short( $candidate['src'] ) . ' — ' . size_format( $bytes ) )
 			);
+			// The full image URL (spec 38): the evidence carries a shortened
+			// path only, and an add-on needs the whole src to find the image.
+			$weight['subject'] = esc_url_raw( (string) $candidate['src'] );
+			$out[]             = $weight;
 		}
 		return $out;
+	}
+
+	/**
+	 * Detail text of the `lcp-image-weight` finding.
+	 *
+	 * Without Caching Out Pro switched on, one plain sentence says Pro can
+	 * do the compression (spec 38, decision 4). Text only: no button, no
+	 * disabled control, nothing locked in the free plugin.
+	 *
+	 * @since 1.24.0
+	 *
+	 * @return string
+	 */
+	private function lcp_weight_detail(): string {
+		$detail = __( 'The likely Largest Contentful Paint image is heavier than it needs to be, and its download time lands directly in your LCP. Re-export it at a lower quality (WebP or AVIF at quality 60-75 is usually indistinguishable) and serve a smaller variant to phones through srcset. Aim for under 50 KB above the fold.', 'cachingout' );
+		if ( class_exists( 'CachingOut_Features' ) && CachingOut_Features::pro_available() ) {
+			return $detail;
+		}
+		return $detail . ' ' . __( 'Caching Out Pro can compress this image for you, on your own server, with a one-click restore.', 'cachingout' );
 	}
 
 	/**
@@ -1558,7 +1607,7 @@ class CachingOut_Page_Audit {
 	}
 
 	private function normalise_finding( array $f ): array {
-		return array(
+		$out = array(
 			'id'        => (string) ( $f['id'] ?? '' ),
 			'status'    => in_array( $f['status'] ?? '', array( 'fix', 'advice', 'pass' ), true ) ? $f['status'] : 'advice',
 			'severity'  => in_array( $f['severity'] ?? '', array( 'high', 'medium', 'low' ), true ) ? $f['severity'] : 'low',
@@ -1570,6 +1619,14 @@ class CachingOut_Page_Audit {
 			'action'    => $this->normalise_action( $f['action'] ?? null ),
 			'feature'   => $this->feature_for_finding( $f ),
 		);
+		// Optional `subject` (1.24.0, spec 38): the full URL of what the
+		// finding is about. The key exists only when set, so every other
+		// finding keeps the exact shape it had before.
+		$subject = isset( $f['subject'] ) && is_string( $f['subject'] ) ? esc_url_raw( $f['subject'] ) : '';
+		if ( '' !== $subject ) {
+			$out['subject'] = $subject;
+		}
+		return $out;
 	}
 
 	/**
@@ -1618,20 +1675,55 @@ class CachingOut_Page_Audit {
 	 * CachingOut_Insights::FINDING_ACTIONS), value and button label, or
 	 * null when the finding has none.
 	 *
+	 * Since 1.24.0 (spec 38) an action may instead carry a `url`: an admin
+	 * URL of this site, rendered as a link button. A url action needs no
+	 * value; an action with neither a valid url nor a value is dropped.
+	 *
 	 * @since 0.1.21
 	 *
 	 * @param mixed $action Raw action.
-	 * @return array{id: string, value: string, label: string}|null
+	 * @return array{id: string, value: string, label: string, url?: string}|null
 	 */
 	private function normalise_action( $action ): ?array {
-		if ( ! is_array( $action ) || empty( $action['id'] ) || ! isset( $action['value'] ) || '' === (string) $action['value'] ) {
+		if ( ! is_array( $action ) || empty( $action['id'] ) ) {
 			return null;
 		}
-		return array(
+		$url   = $this->admin_action_url( $action['url'] ?? '' );
+		$value = isset( $action['value'] ) && is_scalar( $action['value'] ) ? (string) $action['value'] : '';
+		if ( '' === $url && '' === $value ) {
+			return null;
+		}
+		$out = array(
 			'id'    => sanitize_key( (string) $action['id'] ),
-			'value' => (string) $action['value'],
+			'value' => $value,
 			'label' => (string) ( $action['label'] ?? '' ),
 		);
+		// The key exists only on link actions, so value actions keep the
+		// exact shape they had before 1.24.0.
+		if ( '' !== $url ) {
+			$out['url'] = $url;
+		}
+		return $out;
+	}
+
+	/**
+	 * A finding action's link target, kept only when it is an admin URL of
+	 * this site (spec 38): it must start with admin_url() and survive
+	 * wp_validate_redirect() unchanged.
+	 *
+	 * @since 1.24.0
+	 *
+	 * @param mixed $url Raw URL.
+	 * @return string The URL (esc_url_raw), or '' when it is not allowed.
+	 */
+	private function admin_action_url( $url ): string {
+		if ( ! is_string( $url ) || '' === $url ) {
+			return '';
+		}
+		if ( 0 !== strpos( $url, admin_url() ) || wp_validate_redirect( $url, '' ) !== $url ) {
+			return '';
+		}
+		return esc_url_raw( $url );
 	}
 
 	/**

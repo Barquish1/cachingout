@@ -47,6 +47,15 @@ class CachingOut_Purge {
 	private $media_purge_pending = false;
 
 	/**
+	 * The shared runtime snapshot as last read by network_snapshot(), and
+	 * the stat stamp it was read at (multisite only).
+	 *
+	 * @since 1.24.0
+	 * @var array{stamp: string, config: array}|null
+	 */
+	private $snapshot_memo = null;
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 0.1.0
@@ -287,8 +296,8 @@ class CachingOut_Purge {
 			return false;
 		}
 
-		$host    = isset( $parts['host'] ) ? $parts['host'] : '';
 		$is_ssl  = isset( $parts['scheme'] ) && 'https' === $parts['scheme'];
+		$host    = self::host_for_key( $parts, $is_ssl );
 		$path    = isset( $parts['path'] ) ? $parts['path'] : '/';
 		$queries = array();
 
@@ -314,7 +323,9 @@ class CachingOut_Purge {
 			$path,
 			$queries,
 			false,  // is_mobile — irrelevant for deletion (all variants swept)
-			''      // accept_header — irrelevant for deletion
+			'',     // accept_header — irrelevant for deletion
+			null,   // Deprecated language slot.
+			$this->blog_id_for_url( $host, $is_ssl, $path, $parts )
 		);
 
 		$deleted = $this->page_cache->delete( $key );
@@ -341,6 +352,126 @@ class CachingOut_Purge {
 		return $deleted;
 	}
 
+
+	/**
+	 * The host segment a cache key needs for a parsed URL.
+	 *
+	 * The drop-in keys a page on the raw HTTP_HOST header, which carries the
+	 * port whenever it is not the scheme's default (`127.0.0.1:8080`,
+	 * wp-env's `localhost:8888`); CachingOut_Cache_Key turns the colon into
+	 * `-`, so that page lives under `127.0.0.1-8080/`. Up to 1.23.0 this
+	 * method's caller used the bare host, deleted nothing on any site with a
+	 * port, and still reported success. A browser omits a default port from
+	 * the Host header, so 80 (http) and 443 (https) are dropped here too:
+	 * a portless URL produces exactly the host it always did.
+	 *
+	 * @since 1.24.0
+	 *
+	 * @param array $parts  Result of wp_parse_url().
+	 * @param bool  $is_ssl Whether the URL's scheme is https.
+	 * @return string Host, with `:port` appended for a non-default port; '' when the URL has no host.
+	 */
+	private static function host_for_key( array $parts, bool $is_ssl ): string {
+		$host = isset( $parts['host'] ) ? (string) $parts['host'] : '';
+		if ( '' === $host || ! isset( $parts['port'] ) ) {
+			return $host;
+		}
+
+		$port = (int) $parts['port'];
+		if ( ( $is_ssl ? 443 : 80 ) === $port ) {
+			return $host;
+		}
+
+		return $host . ':' . $port;
+	}
+
+	/**
+	 * The blog whose cache directory holds a URL's page (multisite).
+	 *
+	 * The drop-in files a page under `site-<N>/` by matching HTTP_HOST +
+	 * REQUEST_URI against the site list in the shared runtime snapshot
+	 * (CachingOut_Cache_Key::detect_blog_id()). Up to 1.23.0 the purge never
+	 * passed a blog id, so every subsite URL resolved to blog 1's directory
+	 * and a post save (or any URL purge) on a subsite deleted nothing. The
+	 * same snapshot and the same matcher are used here, so the purge looks
+	 * exactly where the drop-in wrote, whichever site the purge runs on: a
+	 * URL of another site (the image-compression `from` page, a main-site
+	 * call) resolves to THAT site.
+	 *
+	 * Without a readable snapshot the drop-in serves and writes nothing, so
+	 * any file left is resolved through WordPress: get_site_by_path() for the
+	 * URL, else the current blog. Single site: always 1, nothing is read.
+	 *
+	 * @since 1.24.0
+	 *
+	 * @param string $host   Host as keyed (host_for_key(): with a non-default port).
+	 * @param bool   $is_ssl Whether the URL's scheme is https.
+	 * @param string $path   URL path.
+	 * @param array  $parts  Result of wp_parse_url().
+	 * @return int Blog id.
+	 */
+	private function blog_id_for_url( string $host, bool $is_ssl, string $path, array $parts ): int {
+		if ( ! is_multisite() ) {
+			return 1;
+		}
+
+		$snapshot = $this->network_snapshot();
+		if ( null !== $snapshot ) {
+			$query = isset( $parts['query'] ) && '' !== $parts['query'] ? '?' . $parts['query'] : '';
+			return CachingOut_Cache_Key::blog_id_for_url(
+				( $is_ssl ? 'https' : 'http' ) . '://' . $host . $path . $query,
+				$snapshot
+			);
+		}
+
+		if ( function_exists( 'get_site_by_path' ) ) {
+			$site = get_site_by_path( strtolower( $host ), '' === $path ? '/' : $path );
+			if ( $site instanceof WP_Site ) {
+				return (int) $site->blog_id;
+			}
+		}
+
+		return (int) get_current_blog_id();
+	}
+
+	/**
+	 * The shared runtime snapshot the drop-in detects the blog from.
+	 *
+	 * Read once per change of the file (inode, mtime and size), because a
+	 * post save fans out to a dozen URL purges.
+	 *
+	 * @since 1.24.0
+	 *
+	 * @return array|null The snapshot, or null when absent or unreadable.
+	 */
+	private function network_snapshot(): ?array {
+		$file = CachingOut_Settings::runtime_config_path();
+		clearstatcache( true, $file );
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- A missing snapshot is the normal single-site case; false is handled below.
+		$stat = @stat( $file );
+		if ( false === $stat ) {
+			$this->snapshot_memo = null;
+			return null;
+		}
+
+		$stamp = $stat['ino'] . ':' . $stat['mtime'] . ':' . $stat['size'];
+		if ( null !== $this->snapshot_memo && $stamp === $this->snapshot_memo['stamp'] ) {
+			return $this->snapshot_memo['config'];
+		}
+
+		$config = include $file;
+		if ( ! is_array( $config ) ) {
+			$this->snapshot_memo = null;
+			return null;
+		}
+
+		$this->snapshot_memo = array(
+			'stamp'  => $stamp,
+			'config' => $config,
+		);
+
+		return $config;
+	}
 
 	/**
 	 * Purge all cached pages for a post, including its archive pages.
