@@ -180,6 +180,13 @@ class CachingOut_Activator {
 			if ( ! class_exists( 'CachingOut_Page_Cache' ) ) {
 				require_once CACHINGOUT_PATH . 'includes/cache/class-page-cache.php';
 			}
+			// purge_all() resolves each site's cache directory through
+			// CachingOut_Cache_Key on multisite; activation can run before the
+			// plugin's bootstrap loads it, so network activation failed this
+			// step with "Class CachingOut_Cache_Key not found" (2026-11-01).
+			if ( ! class_exists( 'CachingOut_Cache_Key' ) ) {
+				require_once CACHINGOUT_PATH . 'includes/cache/class-cache-key.php';
+			}
 			if ( ! class_exists( 'CachingOut_Settings' ) ) {
 				require_once CACHINGOUT_PATH . 'includes/class-settings.php';
 			}

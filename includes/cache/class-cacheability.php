@@ -109,6 +109,21 @@ class CachingOut_Cacheability {
 	);
 
 	/**
+	 * The cookie WordPress sets when a visitor enters a post password
+	 * (`wp-postpass_` + COOKIEHASH).
+	 *
+	 * A page rendered for that visitor holds the unlocked content of every
+	 * password-protected post it shows, so it is never served from or
+	 * written to the cache (1.25.2). Built in: WordPress 6.4 - 6.7 send no
+	 * `no-store` / `private` on those pages for logged-out visitors, so the
+	 * response-side Cache-Control check alone would not catch them there.
+	 *
+	 * @since 1.25.2
+	 * @var string
+	 */
+	const PASSWORD_COOKIE_PREFIX = 'wp-postpass_';
+
+	/**
 	 * Cookies that mark a visitor with a cart or a store session.
 	 *
 	 * Built in for the same reason as SESSION_COOKIES: PRD 5.9 makes the
@@ -129,6 +144,31 @@ class CachingOut_Cacheability {
 		'edd_items_in_cart',
 		'edd_session_*',
 	);
+
+	/**
+	 * Whether a cache MISS for this request may write the page cache.
+	 *
+	 * Asked by the drop-in after request_is_cacheable() said yes and no cached
+	 * copy was served. A request that still carries a query string at that
+	 * point carries only ignored parameters (any other parameter bypassed in
+	 * request_is_cacheable()). Such a request may be SERVED the plain page's
+	 * copy, but it never CREATES that copy: WordPress renders it with the
+	 * parameters in $_GET, and a plugin that reads one server-side (a form
+	 * pre-filling a hidden field from utm_source) would put that visitor's
+	 * version into the copy every visitor gets. So the miss renders uncached
+	 * and stores nothing; only a request with no query string populates the
+	 * cache (1.25.1, reported publicly the day after launch).
+	 *
+	 * @since 1.25.1
+	 *
+	 * @param string $request_uri The request URI (path and query).
+	 * @return true|string True when the miss may write, else a bypass reason.
+	 */
+	public function request_may_write( string $request_uri ) {
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url -- Called from the drop-in, before wp_parse_url() exists.
+		$query = (string) parse_url( $request_uri, PHP_URL_QUERY );
+		return '' === $query ? true : 'BYPASS:ignored-query-miss';
+	}
 
 	/**
 	 * Whether a query parameter name is on an ignore list.
@@ -324,6 +364,11 @@ class CachingOut_Cacheability {
 			}
 		}
 
+		// 11c-1. A visitor who entered a post password (PASSWORD_COOKIE_PREFIX).
+		if ( $this->cookie_exists( $cookies, self::PASSWORD_COOKIE_PREFIX . '*' ) ) {
+			return 'BYPASS:password-cookie';
+		}
+
 		// 11c-2. Cart / store session cookies (built in, see STORE_COOKIES).
 		foreach ( self::STORE_COOKIES as $store_cookie ) {
 			if ( $this->cookie_exists( $cookies, $store_cookie ) ) {
@@ -497,6 +542,15 @@ class CachingOut_Cacheability {
 		// DONOTCACHEPAGE: the page asked not to be cached while it rendered.
 		if ( defined( 'DONOTCACHEPAGE' ) && DONOTCACHEPAGE ) {
 			return 'BYPASS:donotcachepage';
+		}
+
+		// The response asked not to be stored (1.25.2): WordPress 6.8+ sends
+		// "no-store, private" on password-protected posts, and a plugin that
+		// renders per-visitor content can send either. "no-cache" alone only
+		// asks for revalidation and is not honoured here.
+		$directive = $this->private_cache_control( $response_headers );
+		if ( '' !== $directive ) {
+			return 'BYPASS:cache-control:' . $directive;
 		}
 
 		// Responses setting an auth or excluded cookie are never written to cache.
@@ -780,16 +834,33 @@ class CachingOut_Cacheability {
 	 * @return string|null Bypass reason, or null when no forbidden cookie is set.
 	 */
 	private function response_sets_forbidden_cookie( array $response_headers ): ?string {
-		$set_cookie = $this->extract_header( $response_headers, 'Set-Cookie' );
-		if ( '' === $set_cookie ) {
-			return null;
+		// EVERY Set-Cookie line is checked (1.25.1). Before, the drop-in kept
+		// only the last one, so a response that started a session and then
+		// set any other cookie was written to the cache.
+		foreach ( $this->extract_header_values( $response_headers, 'Set-Cookie' ) as $set_cookie ) {
+			$reason = $this->forbidden_cookie_reason( $set_cookie );
+			if ( null !== $reason ) {
+				return $reason;
+			}
 		}
+		return null;
+	}
 
+	/**
+	 * The bypass reason for one Set-Cookie value, or null when it is allowed.
+	 *
+	 * @since 1.25.1 (split out of response_sets_forbidden_cookie()).
+	 *
+	 * @param string $set_cookie One Set-Cookie header value.
+	 * @return string|null
+	 */
+	private function forbidden_cookie_reason( string $set_cookie ): ?string {
 		// Extract cookie name from Set-Cookie header (before first '=').
 		$cookie_name = strtok( $set_cookie, '=' );
-		if ( false === $cookie_name || '' === $cookie_name ) {
+		if ( false === $cookie_name || '' === trim( $cookie_name ) ) {
 			return null;
 		}
+		$cookie_name = trim( $cookie_name );
 
 		// WordPress auth cookies.
 		if ( 0 === strpos( $cookie_name, 'wordpress_logged_in_' ) ) {
@@ -822,39 +893,77 @@ class CachingOut_Cacheability {
 	}
 
 	/**
-	 * Extract a header value from the response headers array.
+	 * The first `no-store` or `private` directive in the response's
+	 * Cache-Control header(s), or '' when there is none.
 	 *
-	 * Headers may be keyed with canonical casing ('Set-Cookie') or lowercase
-	 * ('set-cookie'), or may use numeric keys with 'Header-Name: value' format.
+	 * A directive with a value (`private="Set-Cookie"`) counts as the
+	 * directive. Every Cache-Control value is read, as for Set-Cookie.
 	 *
-	 * @since 0.1.0
+	 * @since 1.25.2
 	 *
-	 * @param array  $headers    Response headers array.
-	 * @param string $header_name Header name to locate.
-	 * @return string Header value, or empty string if not found.
+	 * @param array $response_headers Response headers.
+	 * @return string 'no-store', 'private' or ''.
 	 */
-	private function extract_header( array $headers, string $header_name ): string {
-		// Direct key lookup (case-insensitive on the caller side; handle common variants).
-		if ( isset( $headers[ $header_name ] ) ) {
-			return (string) $headers[ $header_name ];
-		}
-
-		$lower = strtolower( $header_name );
-		foreach ( $headers as $key => $value ) {
-			if ( strtolower( $key ) === $lower ) {
-				return (string) $value;
+	private function private_cache_control( array $response_headers ): string {
+		foreach ( $this->extract_header_values( $response_headers, 'Cache-Control' ) as $value ) {
+			foreach ( explode( ',', strtolower( $value ) ) as $part ) {
+				$name = trim( explode( '=', $part, 2 )[0] );
+				if ( 'no-store' === $name || 'private' === $name ) {
+					return $name;
+				}
 			}
+		}
+		return '';
+	}
 
-			// Handle 'Header-Name: value' format on numeric keys.
-			if ( is_int( $key ) && is_string( $value ) ) {
-				$parts = explode( ':', $value, 2 );
-				if ( count( $parts ) === 2 && strtolower( trim( $parts[0] ) ) === $lower ) {
-					return trim( $parts[1] );
+	/**
+	 * Every value of one header in the response headers array.
+	 *
+	 * Accepts each shape a caller may pass: `Name => 'value'`, `Name =>
+	 * array( 'v1', 'v2' )`, repeated values joined with a newline (how the
+	 * drop-in passes a header sent more than once; PHP refuses a newline
+	 * inside a header value, so it never splits a real value), and numeric
+	 * keys holding raw `Name: value` lines. Name matching is case-insensitive.
+	 *
+	 * @since 1.25.1 (replaces extract_header(), which returned one value).
+	 *
+	 * @param array  $headers     Response headers.
+	 * @param string $header_name Header to collect.
+	 * @return string[] Trimmed, non-empty values in order.
+	 */
+	private function extract_header_values( array $headers, string $header_name ): array {
+		$lower = strtolower( $header_name );
+		$raw   = array();
+		foreach ( $headers as $key => $value ) {
+			if ( is_int( $key ) ) {
+				if ( is_string( $value ) ) {
+					$parts = explode( ':', $value, 2 );
+					if ( 2 === count( $parts ) && strtolower( trim( $parts[0] ) ) === $lower ) {
+						$raw[] = $parts[1];
+					}
+				}
+				continue;
+			}
+			if ( strtolower( (string) $key ) !== $lower ) {
+				continue;
+			}
+			foreach ( is_array( $value ) ? $value : array( $value ) as $one ) {
+				if ( is_scalar( $one ) ) {
+					$raw[] = (string) $one;
 				}
 			}
 		}
 
-		return '';
+		$values = array();
+		foreach ( $raw as $joined ) {
+			foreach ( explode( "\n", $joined ) as $line ) {
+				$line = trim( $line );
+				if ( '' !== $line ) {
+					$values[] = $line;
+				}
+			}
+		}
+		return $values;
 	}
 
 	/**

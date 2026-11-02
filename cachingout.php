@@ -3,7 +3,7 @@
  * Plugin Name:       Caching Out
  * Plugin URI:        https://cachingout.com/docs/
  * Description:       Page caching, browser caching, compression and lazy loading - on the moment you activate. Never cached for logged-in visitors or carts.
- * Version:           1.25.0
+ * Version:           1.25.2
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            Caching Out
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * CACHINGOUT_VERSION must match the Version header above and readme.txt's
  * stable tag. The release script enforces this.
  */
-define( 'CACHINGOUT_VERSION', '1.25.0' );
+define( 'CACHINGOUT_VERSION', '1.25.2' );
 
 
 
@@ -284,7 +284,7 @@ add_action(
 			add_query_arg( 'cachingout_fs_check', '1' ),
 			'cachingout_fs_check'
 		);
-		echo '<div class="' . esc_attr( $class ) . '"><p class="cachingout-notice__title">Caching Out filesystem check<span class="cachingout-notice__version">v' . esc_html( CACHINGOUT_VERSION ) . '</span></p><ul>';
+		echo '<div class="' . esc_attr( $class ) . '"><p class="cachingout-notice__title">Caching Out filesystem check <span class="cachingout-notice__version">v' . esc_html( CACHINGOUT_VERSION ) . '</span></p><ul>';
 		if ( ! empty( $report['steps'] ) && is_array( $report['steps'] ) ) {
 			foreach ( $report['steps'] as $step => $info ) {
 				if ( ! is_array( $info ) ) {

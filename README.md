@@ -9,7 +9,7 @@
 | Requires at least | 6.4 |
 | Tested up to | 7.1 |
 | Requires PHP | 7.4 |
-| Stable tag | 1.25.0 |
+| Stable tag | 1.25.2 |
 | License | [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html) |
 
 Page caching, browser caching, compression and lazy loading - on the moment you activate. Never cached for logged-in visitors or carts.
@@ -178,6 +178,12 @@ Community support for the free plugin is in the WordPress.org support forum for 
 
 ## Upgrade Notice
 
+### 1.25.2
+Important fix for sites with password-protected posts: a page unlocked by one visitor could be cached and shown to others without the password. Update, then purge the cache once. If you added wp-postpass_* to Never cache cookies as a workaround, you can remove it.
+
+### 1.25.1
+Caching fixes for every site: a visit through a tracking link (utm_source, fbclid) no longer creates the plain page's cached copy, and a page setting a session cookie plus another cookie is never cached. Purge the cache once after updating. Update Pro to 1.25.1 too.
+
 ### 1.25.0
 Fixes page purges on sites whose address includes a port number and on multisite subsites: editing or purging a page now clears its cached copy. If you emptied the whole cache by hand after edits on such a site, you no longer need to. Update Caching Out Pro to 1.25.0 for image compression.
 
@@ -209,6 +215,16 @@ Fixes automatic image dimensions resizing images your theme scales with CSS, suc
 Caching Out is now a free plugin on WordPress.org, with the features listed above switched on as they were. Every setting keeps its value and nothing is switched on or off by the upgrade.
 
 ## Changelog
+
+### 1.25.2
+* Fixed: when a visitor who had entered the password of a password-protected post opened it while it had no cached copy, the unlocked page could be stored in the cache and then served to other visitors without the password. A visitor carrying the WordPress post-password cookie is now always served live (debug header BYPASS:password-cookie).
+* Fixed: a page whose response says Cache-Control: no-store or private (WordPress sends both on password-protected posts; some plugins send them on per-visitor pages) is no longer written to the cache (BYPASS:cache-control:no-store / private). Cache-Control: no-cache alone still allows caching.
+
+### 1.25.1
+* Fixed: the first visit to a page through a link carrying only ignored tracking parameters (utm_source, fbclid, gclid and the rest of the ignore list) could create the cached copy that every later visitor of the plain address received, including anything the page printed from those parameters. A visit with tracking parameters is now served from an existing cached copy but never creates one; the debug header reports BYPASS:ignored-query-miss.
+* Fixed: when a page set several cookies, only the last Set-Cookie header was checked, so a page that set a session, login or cart cookie followed by any other cookie could be cached. Every Set-Cookie header is now checked.
+* Fixed: on a WordPress multisite network, activating Caching Out network-wide reported a failed step ("purge_stale_cache") on every site, and the notice then warned that page caching would not work. Network activation now completes on every site.
+* Fixed: a missing space in the title of the activation notice.
 
 ### 1.25.0
 * 1.24.0 was not published on WordPress.org: its fixes (page purges on an address with a port number, and on multisite subsites) reach WordPress.org sites with this version.

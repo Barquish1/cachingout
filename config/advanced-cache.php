@@ -263,6 +263,19 @@ if ( file_exists( $cachingout_cache_file ) ) {
 	$cachingout_page_cache->serve( $cachingout_cache_key );
 }
 
+// A miss may only write when the chokepoint says so (1.25.1): a request
+// carrying ignored tracking parameters may be served the plain copy above,
+// but it never creates it, so it renders uncached and nothing is buffered.
+$cachingout_may_write = method_exists( $cachingout_cacheability, 'request_may_write' )
+	? $cachingout_cacheability->request_may_write( $cachingout_request_uri )
+	: true;
+if ( true !== $cachingout_may_write ) {
+	if ( defined( 'CACHINGOUT_DEBUG' ) && CACHINGOUT_DEBUG ) {
+		header( 'X-CachingOut-Cache: ' . $cachingout_may_write, false );
+	}
+	return;
+}
+
 // Cache miss — output buffering will capture the response for caching.
 if ( defined( 'CACHINGOUT_DEBUG' ) && CACHINGOUT_DEBUG ) {
 	header( 'X-CachingOut-Cache: MISS', false );
@@ -330,12 +343,18 @@ ob_start(
 		$settings     = new CachingOut_Settings();
 		$cacheability = new CachingOut_Cacheability( $settings );
 
-		// Gather response headers.
+		// Gather response headers. A header sent more than once (Set-Cookie)
+		// keeps EVERY value, joined with a newline (PHP refuses a newline
+		// inside a header value, so it never splits a real one); the
+		// chokepoint checks each. Before 1.25.1 the last value overwrote the
+		// others, so a session cookie followed by any other cookie was missed.
 		$response_headers = array();
 		foreach ( headers_list() as $header_line ) {
 			$parts = explode( ':', $header_line, 2 );
 			if ( 2 === count( $parts ) ) {
-				$response_headers[ trim( $parts[0] ) ] = trim( $parts[1] );
+				$name  = trim( $parts[0] );
+				$value = trim( $parts[1] );
+				$response_headers[ $name ] = isset( $response_headers[ $name ] ) ? $response_headers[ $name ] . "\n" . $value : $value;
 			}
 		}
 
