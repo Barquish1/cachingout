@@ -505,6 +505,11 @@ class CachingOut_Settings {
 		// to bypass (the Partner Engine's /go/ links, 1.21.16).
 		$settings['cache']['derived_never_cache_prefixes'] = self::derived_never_cache_prefixes();
 
+		// Derived, never stored: the store pages the compat modules derive
+		// from their page IDs, as prefix => source (`woocommerce`, `edd`), so
+		// a renamed cart page is bypassed before WordPress loads (1.26.0).
+		$settings['cache']['derived_compat_never_cache_prefixes'] = self::derived_compat_never_cache_prefixes();
+
 		// Derived, never stored: the image variants the site serves (spec 36).
 		// Empty without an add-on, so the key never splits by browser.
 		$settings['cache']['image_variants'] = self::image_variants();
@@ -653,11 +658,74 @@ class CachingOut_Settings {
 	 * every purge_all(), which runs on plugin activation and deactivation.
 	 * Only ever called with WordPress loaded.
 	 *
+	 * Only the LIST entries (integer keys) of the filter's value land here.
+	 * A string-keyed entry (`'/basket/' => 'woocommerce'`) names its own
+	 * bypass source and is exported by derived_compat_never_cache_prefixes()
+	 * instead (1.26.0).
+	 *
 	 * @since 1.21.16
 	 * @return string[] Leading path prefixes, each starting with '/' and
 	 *                  longer than '/'.
 	 */
 	public static function derived_never_cache_prefixes(): array {
+		$prefixes = array();
+		foreach ( self::filtered_never_cache_prefixes() as $key => $prefix ) {
+			if ( ! is_int( $key ) ) {
+				continue;
+			}
+			$prefix = self::sanitize_never_cache_prefix( $prefix );
+			if ( '' !== $prefix ) {
+				$prefixes[] = $prefix;
+			}
+		}
+
+		return array_values( array_unique( $prefixes ) );
+	}
+
+	/**
+	 * Path prefixes the compat modules ask the drop-in to bypass, with the
+	 * source each bypass reason names.
+	 *
+	 * The WooCommerce and EDD modules append `prefix => source` entries to
+	 * `cachingout_derived_never_cache_prefixes` for the cart, checkout and
+	 * account pages resolved from their page IDs (so a renamed `/basket/`
+	 * page holds in drop-in context, not only the well-known paths built into
+	 * the chokepoint). Exported as `cache.derived_compat_never_cache_prefixes`;
+	 * never stored in the option. The chokepoint reports a match as
+	 * `BYPASS:exclusion:<source>` (`woocommerce`, `edd`). A source is lowered
+	 * to `[a-z0-9_-]`; one left empty by that becomes `compat`, so a bad
+	 * label never drops an exclusion. Prefixes are sanitized as for
+	 * derived_never_cache_prefixes().
+	 *
+	 * @since 1.26.0
+	 * @return array<string, string> prefix => source.
+	 */
+	public static function derived_compat_never_cache_prefixes(): array {
+		$rules = array();
+		foreach ( self::filtered_never_cache_prefixes() as $prefix => $source ) {
+			if ( ! is_string( $prefix ) ) {
+				continue;
+			}
+			$prefix = self::sanitize_never_cache_prefix( $prefix );
+			if ( '' === $prefix ) {
+				continue;
+			}
+			$source           = is_string( $source ) ? (string) preg_replace( '/[^a-z0-9_-]/', '', strtolower( $source ) ) : '';
+			$rules[ $prefix ] = '' === $source ? 'compat' : $source;
+		}
+
+		return $rules;
+	}
+
+	/**
+	 * The raw value of the `cachingout_derived_never_cache_prefixes` filter,
+	 * or an empty array when WordPress is not loaded or the value is not an
+	 * array.
+	 *
+	 * @since 1.26.0
+	 * @return array
+	 */
+	private static function filtered_never_cache_prefixes(): array {
 		if ( ! function_exists( 'apply_filters' ) ) {
 			return array();
 		}
@@ -665,33 +733,42 @@ class CachingOut_Settings {
 		/**
 		 * Filter the leading path prefixes the page cache always bypasses.
 		 *
-		 * Each entry is a path prefix such as '/go/'. Entries that are not a
-		 * string starting with '/', that are '/' alone (which would switch
-		 * the page cache off for the whole site), or that carry a query
-		 * string or fragment are dropped.
+		 * A list entry is a path prefix such as '/go/' and bypasses as
+		 * `BYPASS:exclusion:partner-engine`. A string-keyed entry
+		 * (`'/basket/' => 'woocommerce'`, since 1.26.0) bypasses as
+		 * `BYPASS:exclusion:<value>`; the compat modules use this form.
+		 * Entries that are not a string starting with '/', that are '/'
+		 * alone (which would switch the page cache off for the whole site),
+		 * or that carry a query string or fragment are dropped.
 		 *
 		 * @since 1.21.16
+		 * @since 1.26.0 String-keyed `prefix => source` entries.
 		 *
-		 * @param string[] $prefixes Leading path prefixes. Default empty.
+		 * @param array $prefixes Leading path prefixes. Default empty.
 		 */
 		$filtered = apply_filters( 'cachingout_derived_never_cache_prefixes', array() );
-		if ( ! is_array( $filtered ) ) {
-			return array();
-		}
 
-		$prefixes = array();
-		foreach ( $filtered as $prefix ) {
-			if ( ! is_string( $prefix ) ) {
-				continue;
-			}
-			$prefix = trim( $prefix );
-			if ( strlen( $prefix ) < 2 || '/' !== $prefix[0] || strpbrk( $prefix, '?#' ) !== false ) {
-				continue;
-			}
-			$prefixes[] = $prefix;
-		}
+		return is_array( $filtered ) ? $filtered : array();
+	}
 
-		return array_values( array_unique( $prefixes ) );
+	/**
+	 * Normalise one never-cache prefix: a trimmed string starting with '/',
+	 * longer than '/', with no query string or fragment; '' otherwise.
+	 *
+	 * @since 1.26.0
+	 *
+	 * @param mixed $prefix Raw entry.
+	 * @return string
+	 */
+	private static function sanitize_never_cache_prefix( $prefix ): string {
+		if ( ! is_string( $prefix ) ) {
+			return '';
+		}
+		$prefix = trim( $prefix );
+		if ( strlen( $prefix ) < 2 || '/' !== $prefix[0] || strpbrk( $prefix, '?#' ) !== false ) {
+			return '';
+		}
+		return $prefix;
 	}
 
 	/**

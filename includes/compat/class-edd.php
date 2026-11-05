@@ -86,6 +86,104 @@ class CachingOut_EDD {
 		$this->register_ajax_exclusions();
 		$this->register_cookie_exclusions();
 		$this->register_purge_hooks();
+		$this->register_snapshot_prefixes();
+	}
+
+	/**
+	 * The EDD option keys (inside `edd_settings`) that name store pages.
+	 *
+	 * @since 1.26.0
+	 * @var string[]
+	 */
+	const PAGE_OPTIONS = array(
+		'purchase_page',
+		'purchase_history_page',
+		'success_page',
+		'failure_page',
+	);
+
+	/**
+	 * Carry the store page paths into the runtime snapshot (1.26.0).
+	 *
+	 * As for WooCommerce: the register_exclusion() callbacks above never
+	 * reach the drop-in, so the checkout, purchase-history, success and
+	 * failure page paths are contributed through
+	 * `cachingout_derived_never_cache_prefixes` as `prefix => 'edd'`, and
+	 * the snapshot is re-exported when EDD's settings option or one of
+	 * those pages is saved.
+	 *
+	 * @since 1.26.0
+	 * @return void
+	 */
+	private function register_snapshot_prefixes(): void {
+		add_filter( 'cachingout_derived_never_cache_prefixes', array( $this, 'add_never_cache_prefixes' ) );
+		add_action( 'update_option_edd_settings', array( $this, 'export_runtime_config' ), 10, 0 );
+		add_action( 'add_option_edd_settings', array( $this, 'export_runtime_config' ), 10, 0 );
+		add_action( 'save_post_page', array( $this, 'on_page_saved' ), 10, 1 );
+	}
+
+	/**
+	 * Append the EDD store page paths, keyed by path with the bypass source
+	 * `edd`, for the runtime snapshot.
+	 *
+	 * @since 1.26.0
+	 *
+	 * @param mixed $prefixes Entries from earlier callbacks.
+	 * @return array
+	 */
+	public function add_never_cache_prefixes( $prefixes ): array {
+		$prefixes = is_array( $prefixes ) ? $prefixes : array();
+		foreach ( $this->store_page_ids() as $id ) {
+			$path = $this->get_page_path( $id );
+			if ( '' !== $path ) {
+				$prefixes[ $path ] = 'edd';
+			}
+		}
+		return $prefixes;
+	}
+
+	/**
+	 * Re-export the runtime snapshot when a store page itself is saved.
+	 *
+	 * @since 1.26.0
+	 *
+	 * @param int $post_id The saved page.
+	 * @return void
+	 */
+	public function on_page_saved( $post_id ): void {
+		if ( in_array( (int) $post_id, $this->store_page_ids(), true ) ) {
+			$this->export_runtime_config();
+		}
+	}
+
+	/**
+	 * Rewrite the runtime snapshot so the drop-in reads the current paths.
+	 *
+	 * @since 1.26.0
+	 * @return void
+	 */
+	public function export_runtime_config(): void {
+		$this->settings->export_runtime_config();
+	}
+
+	/**
+	 * The IDs of the EDD store pages (0 entries dropped).
+	 *
+	 * @since 1.26.0
+	 * @return int[]
+	 */
+	private function store_page_ids(): array {
+		if ( ! function_exists( 'edd_get_option' ) ) {
+			return array();
+		}
+		$ids = array();
+		foreach ( self::PAGE_OPTIONS as $option ) {
+			$id = (int) edd_get_option( $option, 0 );
+			if ( $id > 0 ) {
+				$ids[] = $id;
+			}
+		}
+		return $ids;
 	}
 
 	/*

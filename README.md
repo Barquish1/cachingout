@@ -9,7 +9,7 @@
 | Requires at least | 6.4 |
 | Tested up to | 7.1 |
 | Requires PHP | 7.4 |
-| Stable tag | 1.25.2 |
+| Stable tag | 1.26.0 |
 | License | [GPLv2 or later](https://www.gnu.org/licenses/gpl-2.0.html) |
 
 Page caching, browser caching, compression and lazy loading - on the moment you activate. Never cached for logged-in visitors or carts.
@@ -178,6 +178,9 @@ Community support for the free plugin is in the WordPress.org support forum for 
 
 ## Upgrade Notice
 
+### 1.26.0
+Safety fixes for every site: a renamed WooCommerce or EDD cart page is now excluded by its real address, nested feeds are no longer cached, and uninstalling Caching Out no longer removes another caching plugin's WP_CACHE line. Purge the cache once after updating. Update Pro to 1.26.0 too.
+
 ### 1.25.2
 Important fix for sites with password-protected posts: a page unlocked by one visitor could be cached and shown to others without the password. Update, then purge the cache once. If you added wp-postpass_* to Never cache cookies as a workaround, you can remove it.
 
@@ -215,6 +218,12 @@ Fixes automatic image dimensions resizing images your theme scales with CSS, suc
 Caching Out is now a free plugin on WordPress.org, with the features listed above switched on as they were. Every setting keeps its value and nothing is switched on or off by the upgrade.
 
 ## Changelog
+
+### 1.26.0
+* Fixed: deleting Caching Out removed any define( 'WP_CACHE', ... ) line from wp-config.php, including one that belonged to another caching plugin, which could switch that plugin's page cache off. Uninstall now removes only the line Caching Out wrote, and leaves wp-config.php alone when another plugin's advanced-cache.php is present.
+* Fixed: the WooCommerce and Easy Digital Downloads store pages (cart, checkout, account and their equivalents) were excluded by their default addresses only. Their real addresses, read from the store's page settings, now reach the cache's runtime snapshot, so a renamed cart page such as /basket/ is never cached, even before WordPress loads (debug header BYPASS:exclusion:woocommerce or BYPASS:exclusion:edd).
+* Fixed: feeds below the top level (a category, author or post feed such as /category/news/feed/) were cached and served as HTML. Every feed address is now served live (BYPASS:feed).
+* Added: with CACHINGOUT_DEBUG on, a page that was generated but not stored in the cache ends with an HTML comment naming the reason (for example "not stored: BYPASS:donotcachepage"), so View Source explains a page that is always MISS. Nothing is printed when debug is off.
 
 ### 1.25.2
 * Fixed: when a visitor who had entered the password of a password-protected post opened it while it had no cached copy, the unlocked page could be stored in the cache and then served to other visitors without the password. A visitor carrying the WordPress post-password cookie is now always served live (debug header BYPASS:password-cookie).

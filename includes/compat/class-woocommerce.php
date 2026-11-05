@@ -88,11 +88,129 @@ class CachingOut_WooCommerce {
 		$this->register_ajax_exclusions();
 		$this->register_cookie_exclusions();
 		$this->register_purge_hooks();
+		$this->register_snapshot_prefixes();
 
 		// 1.21.9: the store pages the cache already bypasses are also kept
 		// out of file optimisation. Registered INTO the pipeline's gate, as
 		// the exclusions above are registered into the chokepoint.
 		add_filter( 'cachingout_skip_optimization', array( $this, 'skip_optimization_on_store_pages' ) );
+	}
+
+	/**
+	 * The WooCommerce page-ID options whose change moves a store page.
+	 *
+	 * @since 1.26.0
+	 * @var string[]
+	 */
+	const PAGE_ID_OPTIONS = array(
+		'woocommerce_cart_page_id',
+		'woocommerce_checkout_page_id',
+		'woocommerce_myaccount_page_id',
+	);
+
+	/**
+	 * Carry the store page paths into the runtime snapshot (1.26.0).
+	 *
+	 * The register_exclusion() callbacks above live in this process only;
+	 * the drop-in builds its chokepoint from the snapshot with no
+	 * exclusions, so a cart page renamed to /basket/ was protected there
+	 * only by the well-known paths built into the chokepoint and by
+	 * WooCommerce's own response headers. The paths are contributed through
+	 * `cachingout_derived_never_cache_prefixes` as `prefix => 'woocommerce'`
+	 * (CachingOut_Settings::derived_compat_never_cache_prefixes()), and the
+	 * snapshot is re-exported when a page-ID option or one of those pages
+	 * is saved, so the exported paths follow the store's configuration.
+	 *
+	 * @since 1.26.0
+	 * @return void
+	 */
+	private function register_snapshot_prefixes(): void {
+		add_filter( 'cachingout_derived_never_cache_prefixes', array( $this, 'add_never_cache_prefixes' ) );
+
+		foreach ( self::PAGE_ID_OPTIONS as $option ) {
+			add_action( 'update_option_' . $option, array( $this, 'export_runtime_config' ), 10, 0 );
+			add_action( 'add_option_' . $option, array( $this, 'export_runtime_config' ), 10, 0 );
+		}
+		add_action( 'save_post_page', array( $this, 'on_page_saved' ), 10, 1 );
+	}
+
+	/**
+	 * Append the cart, checkout and account page paths, keyed by path with
+	 * the bypass source `woocommerce`, for the runtime snapshot.
+	 *
+	 * @since 1.26.0
+	 *
+	 * @param mixed $prefixes Entries from earlier callbacks.
+	 * @return array
+	 */
+	public function add_never_cache_prefixes( $prefixes ): array {
+		$prefixes = is_array( $prefixes ) ? $prefixes : array();
+		foreach ( $this->store_page_paths() as $path ) {
+			$prefixes[ $path ] = 'woocommerce';
+		}
+		return $prefixes;
+	}
+
+	/**
+	 * Re-export the runtime snapshot when a store page itself is saved (a
+	 * slug change moves the path while the page ID stays the same).
+	 *
+	 * @since 1.26.0
+	 *
+	 * @param int $post_id The saved page.
+	 * @return void
+	 */
+	public function on_page_saved( $post_id ): void {
+		if ( in_array( (int) $post_id, $this->store_page_ids(), true ) ) {
+			$this->export_runtime_config();
+		}
+	}
+
+	/**
+	 * Rewrite the runtime snapshot so the drop-in reads the current paths.
+	 *
+	 * @since 1.26.0
+	 * @return void
+	 */
+	public function export_runtime_config(): void {
+		$this->settings->export_runtime_config();
+	}
+
+	/**
+	 * The IDs of the cart, checkout and account pages (0 entries dropped).
+	 *
+	 * @since 1.26.0
+	 * @return int[]
+	 */
+	private function store_page_ids(): array {
+		if ( ! function_exists( 'wc_get_page_id' ) ) {
+			return array();
+		}
+		$ids = array();
+		foreach ( array( 'cart', 'checkout', 'myaccount' ) as $page ) {
+			$id = (int) wc_get_page_id( $page );
+			if ( $id > 0 ) {
+				$ids[] = $id;
+			}
+		}
+		return $ids;
+	}
+
+	/**
+	 * The trailing-slashed paths of the store pages, from their permalinks.
+	 *
+	 * @since 1.26.0
+	 * @return string[]
+	 */
+	private function store_page_paths(): array {
+		$paths = array();
+		foreach ( $this->store_page_ids() as $id ) {
+			$path = $this->get_page_path( $id );
+			if ( '' !== $path ) {
+				$paths[] = $path;
+			}
+		}
+		return $paths;
 	}
 
 	/**

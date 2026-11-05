@@ -783,8 +783,14 @@ class CachingOut_Activator {
 				);
 			}
 		} elseif ( ! $enable && $has_wp_cache ) {
-			// Remove ONLY our marker comment + the WP_CACHE define on the next
-			// line, then any remaining bare WP_CACHE define.
+			// Spec 37: never while another plugin's drop-in is in place; it
+			// needs WP_CACHE, even a line we wrote. Nothing is written.
+			if ( self::foreign_dropin_present() ) {
+				return null;
+			}
+
+			// Remove ONLY our marker comment + the WP_CACHE define under it
+			// (spec 37: a bare WP_CACHE define belongs to someone else).
 			//
 			// BUG-008: the previous pattern used `/s` with `.*?WP Caching Out`
 			// which let the engine start at the FIRST `/*` in the file (the
@@ -799,6 +805,10 @@ class CachingOut_Activator {
 					'cachingout_wp_config_strip_failed',
 					__( 'Could not safely remove WP_CACHE from wp-config.php. File left unchanged.', 'cachingout' )
 				);
+			}
+			if ( $new_content === $content ) {
+				// The only WP_CACHE line is not ours: nothing to remove.
+				return null;
 			}
 		} else {
 			// Already in the desired state: no change needed.
@@ -894,44 +904,72 @@ class CachingOut_Activator {
 	}
 
 	/**
-	 * Strip the WP_CACHE constant (and our marker comment) from wp-config content.
+	 * Strip OUR WP_CACHE constant (and our marker comment) from wp-config content.
 	 *
 	 * Line-scoped only. Never uses the `/s` dotall flag across comment bodies.
+	 * Only the define directly under our marker comment is ours (spec 37):
+	 * a WP_CACHE line written by another cache plugin, the host or by hand
+	 * is never removed.
 	 *
 	 * @since 0.1.4
+	 * @since 1.26.0 Removes only the define under our marker (spec 37).
 	 *
 	 * @param string $content Full wp-config.php contents.
 	 * @return string|null Updated contents, or null if a regex failed.
 	 */
 	public static function strip_wp_cache_constant( string $content ) {
 		// Pure line walk — no multi-line regex. A line is dropped only when
-		// the ENTIRE line (trimmed) is our marker comment or a WP_CACHE
-		// define. Nothing else can be deleted. Used by uninstall / tools;
-		// deactivate deliberately does not call this (BUG-008).
+		// the ENTIRE line (trimmed) is our marker comment, or a WP_CACHE
+		// define on the next non-blank line after it. Nothing else can be
+		// deleted. Used by uninstall / tools; deactivate deliberately does
+		// not call this (BUG-008).
 		$eol = ( false !== strpos( $content, "\r\n" ) ) ? "\r\n" : "\n";
 		$lines = preg_split( '/\r\n|\n|\r/', $content );
 		if ( ! is_array( $lines ) ) {
 			return null;
 		}
 
-		$out = array();
+		$out          = array();
+		$after_marker = false;
 		foreach ( $lines as $line ) {
 			$trimmed = trim( $line );
 
 			// Our one-line marker comment only (entire line).
 			if ( preg_match( '/^\/\*\*?[^*]*WP Caching Out[^*]*\*\/$/', $trimmed ) ) {
+				$after_marker = true;
 				continue;
 			}
 
-			// Entire line is define( 'WP_CACHE', true|false );
-			if ( preg_match( '/^define\s*\(\s*[\'"]WP_CACHE[\'"]\s*,\s*(?:true|false)\s*\)\s*;$/', $trimmed ) ) {
-				continue;
+			if ( $after_marker && '' !== $trimmed ) {
+				$after_marker = false;
+				// Entire line is define( 'WP_CACHE', true|false ); under our marker.
+				if ( preg_match( '/^define\s*\(\s*[\'"]WP_CACHE[\'"]\s*,\s*(?:true|false)\s*\)\s*;$/', $trimmed ) ) {
+					continue;
+				}
 			}
 
 			$out[] = $line;
 		}
 
 		return implode( $eol, $out );
+	}
+
+	/**
+	 * Whether another plugin's advanced-cache.php is in place.
+	 *
+	 * Uninstall removes our own drop-in before the constant, so a drop-in
+	 * still on disk that is not ours belongs to another cache plugin, which
+	 * needs WP_CACHE (spec 37; the ownership rule of rule 03). Unrecognised
+	 * content counts as foreign: fail closed.
+	 *
+	 * @since 1.26.0
+	 * @return bool
+	 */
+	private static function foreign_dropin_present(): bool {
+		if ( ! class_exists( 'CachingOut_Dropin_Owner' ) ) {
+			require_once CACHINGOUT_PATH . 'includes/cache/class-dropin-owner.php';
+		}
+		return file_exists( CachingOut_Dropin_Owner::dropin_path() ) && ! CachingOut_Dropin_Owner::is_ours();
 	}
 
 
@@ -1506,9 +1544,23 @@ class CachingOut_Activator {
 	 * itself.
 	 *
 	 * @since 0.1.0
+	 * @since 1.26.0 Filterable, so tests can point it at a temporary file.
 	 * @return string|null Absolute path to wp-config.php, or null if not found.
 	 */
 	public static function get_wp_config_path(): ?string {
+		/**
+		 * Filter the wp-config.php path (tests redirect it to a temp file,
+		 * like `cachingout_dropin_path`). A non-empty string is used as is.
+		 *
+		 * @since 1.26.0
+		 *
+		 * @param string $path Empty for the standard lookup below.
+		 */
+		$filtered = function_exists( 'apply_filters' ) ? apply_filters( 'cachingout_wp_config_path', '' ) : '';
+		if ( is_string( $filtered ) && '' !== $filtered ) {
+			return $filtered;
+		}
+
 		// Standard location: one directory above ABSPATH.
 		$path = dirname( ABSPATH ) . '/wp-config.php';
 		if ( file_exists( $path ) ) {

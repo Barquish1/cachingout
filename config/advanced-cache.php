@@ -63,6 +63,42 @@ if ( ! function_exists( 'cachingout_dropin_plugin_dir' ) ) {
 	}
 }
 
+if ( ! function_exists( 'cachingout_dropin_not_stored_comment' ) ) {
+	/**
+	 * Append the debug-only "not stored" comment to a page the chokepoint
+	 * refused to write (1.26.0).
+	 *
+	 * The X-CachingOut-Cache header on such a page says MISS: it was sent
+	 * before the page was generated, and the write verdict comes after. With
+	 * CACHINGOUT_DEBUG on, the reason is appended to the RETURNED html as
+	 * `<!-- Caching Out: not stored: BYPASS:... -->`, so View Source shows
+	 * it; it is never written to the cache (nothing is, on this path). Only
+	 * an HTML document (one that closes `</html>`) is annotated: a JSON or
+	 * XML body is returned untouched. Zero work when debug is off. The
+	 * reason is the chokepoint's verdict; this decides nothing.
+	 *
+	 * Declared before the early returns below so the unit test can call it
+	 * under the CLI SAPI, where the drop-in itself returns at once.
+	 *
+	 * @param string    $html   The rendered page.
+	 * @param mixed     $reason The chokepoint's verdict (a `BYPASS:...` string).
+	 * @param bool|null $debug  Whether debug is on; null reads CACHINGOUT_DEBUG.
+	 * @return string The html, with the comment appended when it applies.
+	 */
+	function cachingout_dropin_not_stored_comment( $html, $reason, $debug = null ) {
+		if ( null === $debug ) {
+			$debug = defined( 'CACHINGOUT_DEBUG' ) && CACHINGOUT_DEBUG;
+		}
+		if ( ! $debug || ! is_string( $reason ) || '' === $reason || false === stripos( $html, '</html>' ) ) {
+			return $html;
+		}
+		// A reason can carry a cookie name or pattern from settings: keep the
+		// comment well-formed whatever it holds.
+		$safe = str_replace( array( '--', '<', '>' ), array( '- -', '', '' ), $reason );
+		return $html . "\n<!-- Caching Out: not stored: " . $safe . ' -->';
+	}
+}
+
 // The kill switch. define( 'CACHINGOUT_DISABLE_CACHE', true ) in wp-config.php
 // must disable all cache reading and writing, in every version, forever.
 if ( defined( 'CACHINGOUT_DISABLE_CACHE' ) && CACHINGOUT_DISABLE_CACHE ) {
@@ -371,7 +407,9 @@ ob_start(
 		// nonce-in-HTML scan.
 		$response_result = $cacheability->response_is_cacheable( $status_code, $response_headers, $html );
 		if ( true !== $response_result ) {
-			return $html;
+			// Debug only: name the reason at the end of the RETURNED page
+			// (never cached; nothing is, here). See the helper above.
+			return cachingout_dropin_not_stored_comment( $html, $response_result );
 		}
 
 		// Reconstruct the cache key from the request context. The blog_id MUST

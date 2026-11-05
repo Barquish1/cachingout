@@ -228,6 +228,45 @@ class CachingOut_Cacheability {
 	}
 
 	/**
+	 * The never-cache path prefixes the snapshot carries, as prefix => source,
+	 * where `source` is what the bypass reason names (`BYPASS:exclusion:<source>`).
+	 *
+	 * Two snapshot keys feed it. `cache.derived_compat_never_cache_prefixes`
+	 * is a map of prefix => source written by the compat modules (the
+	 * WooCommerce and EDD store pages derived from their page IDs, so a
+	 * renamed cart page holds in drop-in context; 1.26.0).
+	 * `cache.derived_never_cache_prefixes` is the plain list another plugin
+	 * registers (the Partner Engine's /go/ links, 1.21.16) and always reports
+	 * `partner-engine`; it is read last so its reason wins on a shared prefix
+	 * and the 1.21.16 behaviour is unchanged. A value that is not an array,
+	 * and an entry whose prefix or source is not a non-empty string, is
+	 * skipped (an empty prefix would match every path), so a damaged snapshot
+	 * fails closed.
+	 *
+	 * @since 1.26.0
+	 * @return array<string, string>
+	 */
+	private function never_cache_prefix_rules(): array {
+		$rules = array();
+
+		$compat = $this->settings->get( 'cache', 'derived_compat_never_cache_prefixes', array() );
+		foreach ( is_array( $compat ) ? $compat : array() as $prefix => $source ) {
+			if ( is_string( $prefix ) && '' !== $prefix && is_string( $source ) && '' !== $source ) {
+				$rules[ $prefix ] = $source;
+			}
+		}
+
+		$partner = $this->settings->get( 'cache', 'derived_never_cache_prefixes', array() );
+		foreach ( is_array( $partner ) ? $partner : array() as $prefix ) {
+			if ( is_string( $prefix ) && '' !== $prefix ) {
+				$rules[ $prefix ] = 'partner-engine';
+			}
+		}
+
+		return $rules;
+	}
+
+	/**
 	 * Determine whether the current request may be served from cache.
 	 *
 	 * Checks every built-in exclusion, user-configured exclusion, and
@@ -263,19 +302,18 @@ class CachingOut_Cacheability {
 			return 'BYPASS:method:' . strtoupper( $method );
 		}
 
-		// 3b. Never-cache path prefixes registered by another plugin (the
-		// Partner Engine's /go/ links), exported into the snapshot as
-		// `cache.derived_never_cache_prefixes` (see
-		// CachingOut_Settings::derived_never_cache_prefixes()). Checked
+		// 3b. Never-cache path prefixes exported into the snapshot (see
+		// never_cache_prefix_rules()): another plugin's prefixes (the Partner
+		// Engine's /go/ links, `cache.derived_never_cache_prefixes`) and the
+		// store pages the compat modules derive from their page IDs
+		// (`cache.derived_compat_never_cache_prefixes`, 1.26.0), so a RENAMED
+		// cart page is bypassed in the drop-in before WordPress loads. Checked
 		// before every other path rule so the reason is always the same.
-		$never_prefixes = $this->settings->get( 'cache', 'derived_never_cache_prefixes', array() );
-		if ( is_array( $never_prefixes ) && array() !== $never_prefixes ) {
-			$path_only    = strtok( $url, '?' );
-			$request_path = $path_only ? $path_only : $url;
-			foreach ( $never_prefixes as $never_prefix ) {
-				if ( is_string( $never_prefix ) && '' !== $never_prefix && $this->path_starts_with( $request_path, $never_prefix ) ) {
-					return 'BYPASS:exclusion:partner-engine';
-				}
+		$path_only    = strtok( $url, '?' );
+		$request_path = $path_only ? $path_only : $url;
+		foreach ( $this->never_cache_prefix_rules() as $never_prefix => $source ) {
+			if ( $this->path_starts_with( $request_path, $never_prefix ) ) {
+				return 'BYPASS:exclusion:' . $source;
 			}
 		}
 
@@ -302,8 +340,10 @@ class CachingOut_Cacheability {
 			return 'BYPASS:rest-api';
 		}
 
-		// 7. Feeds.
-		if ( $this->path_starts_with( $url, '/feed/' ) || $this->path_starts_with( $url, '/comments/feed/' ) ) {
+		// 7. Feeds: a `feed` path segment anywhere (/feed/, /comments/feed/,
+		// /category/x/feed/, /post/feed/, /feed/rss2/). Until 1.26.0 only the
+		// two leading forms matched, so nested feeds were cached as text/html.
+		if ( $this->path_is_feed( $url ) ) {
 			return 'BYPASS:feed';
 		}
 
@@ -637,6 +677,23 @@ class CachingOut_Cacheability {
 		// Strip query string from URL before comparison.
 		$stripped = rtrim( strtok( $url, '?' ) ?: $url, '/' );
 		return $stripped === $path;
+	}
+
+	/**
+	 * Check whether a URL is a WordPress feed: a `feed` path segment anywhere.
+	 *
+	 * Matches /feed/, /feed, /comments/feed/, /category/x/feed/, /post/feed/
+	 * and /feed/rss2/. A slug that merely starts with the word (/feedback/)
+	 * does not match: the segment must end at a slash or the end of the path.
+	 *
+	 * @since 1.26.0
+	 *
+	 * @param string $url Request path (query string allowed; it is stripped).
+	 * @return bool
+	 */
+	private function path_is_feed( string $url ): bool {
+		$stripped = strtok( $url, '?' ) ?: $url;
+		return 1 === preg_match( '#/feed(?:/|$)#i', $stripped );
 	}
 
 	/**
