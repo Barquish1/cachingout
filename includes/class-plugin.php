@@ -262,6 +262,8 @@ class CachingOut_Plugin {
 		require_once CACHINGOUT_PATH . 'includes/class-filesystem-check.php';
 		require_once CACHINGOUT_PATH . 'includes/cache/class-rival-remnants.php';
 		require_once CACHINGOUT_PATH . 'includes/cache/class-cacheability.php';
+		require_once CACHINGOUT_PATH . 'includes/cache/class-bypass-templates.php';
+		require_once CACHINGOUT_PATH . 'includes/cache/class-bypass-explainer.php';
 		require_once CACHINGOUT_PATH . 'includes/cache/class-cache-key.php';
 		require_once CACHINGOUT_PATH . 'includes/cache/class-page-cache.php';
 		require_once CACHINGOUT_PATH . 'includes/cache/class-purge.php';
@@ -290,6 +292,7 @@ class CachingOut_Plugin {
 		require_once CACHINGOUT_PATH . 'includes/compat/class-polylang.php';
 		require_once CACHINGOUT_PATH . 'admin/class-admin.php';
 		require_once CACHINGOUT_PATH . 'admin/class-filesystem-check-page.php';
+		require_once CACHINGOUT_PATH . 'admin/class-page-check.php';
 		require_once CACHINGOUT_PATH . 'includes/admin-bar/class-admin-bar.php';
 		require_once CACHINGOUT_PATH . 'includes/class-setup-wizard.php';
 		require_once CACHINGOUT_PATH . 'includes/insights/class-insights.php';
@@ -346,6 +349,10 @@ class CachingOut_Plugin {
 		// the wizard to register the "Setup Wizard" entry under Caching Out.
 		$this->setup_wizard = new CachingOut_Setup_Wizard( $this->settings );
 		$this->admin->set_wizard( $this->setup_wizard );
+
+		// The Cache tab's "Check a page" tool asks the wired chokepoint, so
+		// every compat exclusion registered above is part of its answer.
+		$this->admin->set_cacheability( $this->cacheability );
 
 		// Insights tab: the Page Audit. The PageSpeed client and telemetry
 		// are injected by the Pro add-on.

@@ -2,23 +2,23 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Caching Out 1.26.0\n"
+"Project-Id-Version: Caching Out 1.27.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/cachingout\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-05T15:42:36+00:00\n"
+"POT-Creation-Date: 2026-11-06T02:49:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: cachingout\n"
 
 #. Plugin Name of the plugin
 #. Author of the plugin
-#: admin/class-admin.php:419
-#: admin/class-admin.php:420
-#: admin/class-admin.php:786
+#: admin/class-admin.php:470
+#: admin/class-admin.php:471
+#: admin/class-admin.php:837
 #: includes/admin-bar/class-admin-bar.php:71
 #: includes/class-object-cache-notice.php:82
 msgid "Caching Out"
@@ -36,125 +36,183 @@ msgstr ""
 msgid "https://cachingout.com"
 msgstr ""
 
-#: admin/class-admin.php:315
-#: admin/class-admin.php:946
+#: admin/class-admin.php:361
+#: admin/class-admin.php:997
 msgid "Insights"
 msgstr ""
 
-#: admin/class-admin.php:316
+#: admin/class-admin.php:362
 msgid "Pro"
 msgstr ""
 
-#: admin/class-admin.php:389
-#: admin/class-admin.php:433
+#: admin/class-admin.php:440
+#: admin/class-admin.php:484
 msgid "Settings"
 msgstr ""
 
-#: admin/class-admin.php:397
-#: admin/class-admin.php:442
-#: admin/class-admin.php:443
-#: admin/class-admin.php:815
+#: admin/class-admin.php:448
+#: admin/class-admin.php:493
+#: admin/class-admin.php:494
+#: admin/class-admin.php:866
 msgid "Setup Wizard"
 msgstr ""
 
-#: admin/class-admin.php:432
-#: admin/class-admin.php:713
+#: admin/class-admin.php:483
+#: admin/class-admin.php:764
 msgid "Caching Out Settings"
 msgstr ""
 
-#: admin/class-admin.php:454
-#: admin/class-admin.php:455
+#: admin/class-admin.php:505
+#: admin/class-admin.php:506
 #: admin/views/view-filesystem_check.php:38
 msgid "Filesystem Check"
 msgstr ""
 
-#: admin/class-admin.php:599
-#: admin/class-admin.php:1630
+#: admin/class-admin.php:650
+#: admin/class-admin.php:1681
 msgid "See what Pro adds"
 msgstr ""
 
-#: admin/class-admin.php:706
-#: admin/class-admin.php:1013
-#: admin/class-admin.php:1071
+#: admin/class-admin.php:757
+#: admin/class-admin.php:1064
+#: admin/class-admin.php:1122
 #: admin/class-filesystem-check-page.php:113
 #: admin/class-filesystem-check-page.php:176
+#: admin/class-page-check.php:90
 #: includes/class-setup-wizard.php:230
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: admin/class-admin.php:715
+#: admin/class-admin.php:766
 msgid "Skip to main content"
 msgstr ""
 
-#: admin/class-admin.php:723
+#: admin/class-admin.php:774
 msgid "Settings sections"
 msgstr ""
 
-#: admin/class-admin.php:752
+#: admin/class-admin.php:803
 msgid "Settings saved."
 msgstr ""
 
-#: admin/class-admin.php:789
+#: admin/class-admin.php:840
 msgid "Performance Optimization"
 msgstr ""
 
-#: admin/class-admin.php:810
+#: admin/class-admin.php:861
 msgid "Documentation"
 msgstr ""
 
 #. translators: %s: settings tab label, e.g. "Cache".
-#: admin/class-admin.php:847
+#: admin/class-admin.php:898
 msgid "Documentation: %s"
 msgstr ""
 
-#: admin/class-admin.php:940
+#: admin/class-admin.php:991
 msgid "Performance"
 msgstr ""
 
-#: admin/class-admin.php:942
+#: admin/class-admin.php:993
 msgid "Optimization"
 msgstr ""
 
-#: admin/class-admin.php:944
+#: admin/class-admin.php:995
 msgid "Delivery"
 msgstr ""
 
-#: admin/class-admin.php:948
+#: admin/class-admin.php:999
 msgid "Account"
 msgstr ""
 
-#: admin/class-admin.php:950
+#: admin/class-admin.php:1001
 msgid "Other"
 msgstr ""
 
-#: admin/class-admin.php:973
+#: admin/class-admin.php:1024
 #: admin/class-filesystem-check-page.php:156
 msgid "Settings view not found."
 msgstr ""
 
-#: admin/class-admin.php:1025
+#: admin/class-admin.php:1076
 msgid "Invalid settings tab."
 msgstr ""
 
 #. translators: %s: operation name
-#: admin/class-admin.php:1308
+#: admin/class-admin.php:1359
 msgid "Unknown database operation: %s."
 msgstr ""
 
-#: admin/class-admin.php:1571
+#: admin/class-admin.php:1622
 msgid "Close"
 msgstr ""
 
-#: admin/class-admin.php:1647
+#: admin/class-admin.php:1698
 msgid "Part of Caching Out Pro, which is installed here and switches on with your licence:"
 msgstr ""
 
-#: admin/class-admin.php:1649
+#: admin/class-admin.php:1700
 msgid "Part of Caching Out Pro:"
 msgstr ""
 
 #: admin/class-filesystem-check-page.php:149
 msgid "Caching Out Filesystem Check"
+msgstr ""
+
+#: admin/class-page-check.php:210
+msgid "Check a page: why isn't it cached?"
+msgstr ""
+
+#: admin/class-page-check.php:217
+msgid "Address to check"
+msgstr ""
+
+#: admin/class-page-check.php:220
+msgid "A path or a full address on this site. The check asks the same rules the cache uses, as a visitor who is not logged in and has no cookies."
+msgstr ""
+
+#: admin/class-page-check.php:228
+msgid "Also fetch the page to run the rules that apply after it is generated (status, headers, security tokens)."
+msgstr ""
+
+#: admin/class-page-check.php:231
+msgid "Check this page"
+msgstr ""
+
+#: admin/class-page-check.php:256
+msgid "This page can be cached and stored"
+msgstr ""
+
+#: admin/class-page-check.php:256
+msgid "This page can be served from cache"
+msgstr ""
+
+#: admin/class-page-check.php:262
+msgid "Every rule passed: the request may be served from cache and the page the site returned may be written to it. The first anonymous visit stores it; the next is a HIT."
+msgstr ""
+
+#: admin/class-page-check.php:262
+msgid "Every request-stage rule passed. Tick \"Also fetch the page\" to run the rules that apply after the page is generated."
+msgstr ""
+
+#: admin/class-page-check.php:268
+msgid "This is correct behaviour."
+msgstr ""
+
+#: admin/class-page-check.php:270
+msgid "You can change this."
+msgstr ""
+
+#: admin/class-page-check.php:272
+msgid "Whether to change this depends on your site."
+msgstr ""
+
+#: admin/class-page-check.php:278
+msgid "Read more in the documentation"
+msgstr ""
+
+#. translators: %s: the HTTP error message.
+#: admin/class-page-check.php:286
+msgid "The page could not be fetched, so only the request-stage rules were checked: %s"
 msgstr ""
 
 #: admin/views/view-browser_cache.php:26
@@ -1109,6 +1167,480 @@ msgstr ""
 msgid "Warm the cache by crawling the sitemap"
 msgstr ""
 
+#: includes/cache/class-bypass-templates.php:45
+msgid "Nothing. This is correct behaviour."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:46
+msgid "Nothing. Never cached, by design."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:50
+msgid "Not this site"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:50
+msgid "The address belongs to another host, so this site cannot answer for it."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:50
+msgid "Enter a path such as /about/ or a full address on this site."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:51
+msgid "Kill switch on"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:51
+msgid "CACHINGOUT_DISABLE_CACHE is set to true in wp-config.php, so no page is read from or written to the cache."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:51
+msgid "Intended while you investigate a problem. Remove that line to resume caching."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:52
+msgid "Page caching is switched off"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:52
+msgid "The \"Enable page caching\" switch on the Cache tab is off."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:52
+msgid "Switch it on and save."
+msgstr ""
+
+#. translators: %s: the HTTP method, e.g. POST.
+#: includes/cache/class-bypass-templates.php:54
+msgid "Not a GET request"
+msgstr ""
+
+#. translators: %s: the HTTP method, e.g. POST.
+#: includes/cache/class-bypass-templates.php:54
+msgid "The request used the %s method, for example a form submission. Only GET responses can be shared between visitors."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:55
+msgid "AJAX endpoint"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:55
+msgid "The request went to wp-admin/admin-ajax.php, which answers one visitor at a time."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:56
+msgid "Administration page"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:56
+msgid "The address is under /wp-admin. The dashboard is never cached."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:57
+msgid "Login page"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:57
+msgid "The address is wp-login.php."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:58
+msgid "Registration page"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:58
+msgid "The address is wp-register.php."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:59
+msgid "REST API"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:59
+msgid "The request went to a /wp-json/ endpoint. API responses are not pages."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:60
+msgid "Feed"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:60
+msgid "The address is a feed: /feed/, /comments/feed/, or a feed segment anywhere in the address. A slug that merely starts with the word, like /feedback/, is not a feed."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:61
+msgid "robots.txt"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:61
+msgid "The address is /robots.txt, which the web server and WordPress answer directly."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:62
+msgid "XML sitemap"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:62
+msgid "The address is an XML sitemap."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:63
+msgid "PHP file"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:63
+msgid "The address ends in .php, for example xmlrpc.php. Those are scripts, not pages."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:64
+msgid "Static file"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:64
+msgid "The address ends in an image, stylesheet, script, font or media extension. Those are served by the web server, not the page cache."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:64
+msgid "Nothing. Their caching is handled by Browser Caching."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:65
+msgid "Logged-in visitor"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:65
+msgid "The request carried a WordPress login cookie. A cached copy is shared between everyone who sees it, so a logged-in visitor is always served live."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:65
+msgid "Nothing. Log out or use a private window to see what visitors get."
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:67
+msgid "Language or currency cookie"
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:67
+msgid "The visitor carries the %s cookie, which changes what the same address shows, so a shared copy could be the wrong language or currency."
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:67
+msgid "When each language has its own address the cookie is ignored. When every language shares one address, give each its own, or accept that these visitors are served live."
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:69
+msgid "PHP session"
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:69
+msgid "The visitor has a PHP session (%s). A session ties a page to one person, so it is never shared."
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:69
+msgid "If every page reports this, a plugin or theme starts a session for every visitor: find it (deactivate plugins one at a time) and ask its author for a setting that limits the session to the pages that need one."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:70
+msgid "Post password entered"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:70
+msgid "The visitor has entered a post password on this site (the wp-postpass_ cookie). Pages rendered for them can hold protected content, so they are always served live."
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:72
+msgid "Shopper with a cart"
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:72
+msgid "The visitor has the %s cookie: a WooCommerce or Easy Digital Downloads cart or store session. A shopper with a cart is always served live."
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:74
+msgid "Your own excluded cookie"
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:74
+msgid "The visitor has the %s cookie, which is on your \"Never cache when these cookies are present\" list on the Cache tab."
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:74
+#: includes/cache/class-bypass-templates.php:101
+msgid "Adjust or remove that entry if it is too broad."
+msgstr ""
+
+#. translators: %s: the pattern on the user's list that matched.
+#: includes/cache/class-bypass-templates.php:76
+msgid "Your own excluded user agent"
+msgstr ""
+
+#. translators: %s: the pattern on the user's list that matched.
+#: includes/cache/class-bypass-templates.php:76
+msgid "The browser identification matches \"%s\" on your \"Never cache for these user agents\" list on the Cache tab."
+msgstr ""
+
+#. translators: %s: the pattern on the user's list that matched.
+#: includes/cache/class-bypass-templates.php:76
+msgid "Adjust or remove that entry."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:77
+msgid "Query parameter not on the ignore list"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:77
+msgid "The address has a query parameter that is not on your \"Ignored query parameters\" list, for example ?ref=newsletter. A parameter that is not listed may change the page, so the request is served live."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:77
+msgid "If the parameter is a tracking tag that does not change the page, add it to \"Ignored query parameters\" on the Cache tab; if a default is missing, use \"Restore default parameters\". Leave out any parameter that changes what the page shows."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:78
+msgid "Tracking parameters on a first visit"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:78
+msgid "Every parameter on the address is on the ignore list, so the visitor may be SERVED the plain page's copy, but this visit never CREATES that copy: a plugin reading the parameter server-side would otherwise put one visitor's version into the copy everyone gets."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:78
+msgid "Nothing. The plain address, without parameters, fills the cache; visitors with tracking tags are served from it afterwards."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:79
+msgid "WooCommerce cart"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:79
+msgid "The address is a /cart/ page."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:80
+msgid "WooCommerce checkout"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:80
+msgid "The address is a /checkout/ page."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:81
+msgid "WooCommerce account"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:81
+msgid "The address is /my-account/ or a WooCommerce account endpoint such as /order-received/, /view-order/ or /downloads/."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:82
+msgid "EDD purchase history"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:82
+msgid "The address is an Easy Digital Downloads /purchase-history/ page."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:83
+msgid "EDD purchase confirmation"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:83
+msgid "The address is an Easy Digital Downloads /purchase-confirmation/ or /purchase-receipt/ page."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:84
+msgid "Your own excluded address"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:84
+msgid "The address matches one of your \"Never cache these URLs\" patterns on the Cache tab."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:84
+msgid "Adjust or remove that pattern if it is too broad."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:85
+msgid "WooCommerce store page"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:85
+msgid "The address is your store's cart, checkout or account page as configured in WooCommerce, wherever it lives: a cart page renamed to /basket/ is covered."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:85
+msgid "Nothing. If a page is listed that is not a store page, check the page assignments in WooCommerce (Settings, Advanced)."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:86
+msgid "Easy Digital Downloads store page"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:86
+msgid "The address is your store's checkout, purchase-history or purchase-confirmation page as configured in Easy Digital Downloads, wherever it lives."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:86
+msgid "Nothing. If a page is listed that is not a store page, check the page assignments in EDD (Settings, General)."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:87
+msgid "Partner Engine link"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:87
+msgid "The address is under a link prefix the Partner Engine plugin registered (its /go/ links), which redirect per click."
+msgstr ""
+
+#. translators: %s: the name of a compatibility module.
+#: includes/cache/class-bypass-templates.php:89
+msgid "Excluded by a compatibility module"
+msgstr ""
+
+#. translators: %s: the name of a compatibility module.
+#: includes/cache/class-bypass-templates.php:89
+msgid "A rule registered by the \"%s\" compatibility module matched this address."
+msgstr ""
+
+#. translators: %s: the name of a compatibility module.
+#: includes/cache/class-bypass-templates.php:89
+msgid "Usually intended. The name says which module asked for it; check that module's own settings."
+msgstr ""
+
+#. translators: %s: an HTTP status code, e.g. 404.
+#: includes/cache/class-bypass-templates.php:91
+msgid "Not a 200 response"
+msgstr ""
+
+#. translators: %s: an HTTP status code, e.g. 404.
+#: includes/cache/class-bypass-templates.php:91
+msgid "The page answered with status %s instead of 200 OK: a redirect, a missing page or a server error. Only successful pages are stored."
+msgstr ""
+
+#. translators: %s: an HTTP status code, e.g. 404.
+#: includes/cache/class-bypass-templates.php:91
+msgid "If a page you expect to work reports a code here, fix the page. A redirect is normal and is never stored."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:92
+msgid "A plugin asked for no caching"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:92
+msgid "A plugin or the theme asked, while the page was being generated, for this page not to be cached (it defined DONOTCACHEPAGE, the signal every caching plugin honours). Polylang does this on the front page in your default language when it detects the browser language; WooCommerce on its cart, checkout and account pages."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:92
+msgid "The plugin that asked decides; Caching Out will not override it. For Polylang, switch off \"Detect browser language\" (Languages, Settings) to cache the front page, or keep the redirect and accept a live page. Otherwise find the plugin (deactivate plugins one at a time) and check its settings."
+msgstr ""
+
+#. translators: %s: the header's value, e.g. private.
+#: includes/cache/class-bypass-templates.php:94
+msgid "The page said it is private"
+msgstr ""
+
+#. translators: %s: the header's value, e.g. private.
+#: includes/cache/class-bypass-templates.php:94
+msgid "The page itself sent Cache-Control: %s, which says it is for one visitor only. WordPress does this on password-protected posts; some plugins do it on per-visitor pages."
+msgstr ""
+
+#. translators: %s: the header's value, e.g. private.
+#: includes/cache/class-bypass-templates.php:94
+msgid "Usually nothing. If every page reports it, a plugin or the theme sends the header everywhere: find it (deactivate plugins one at a time) and ask its maker."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:95
+msgid "The page logged someone in"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:95
+msgid "The response set a WordPress login cookie."
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:97
+msgid "The page started a PHP session"
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:97
+msgid "The response set the %s cookie, starting a PHP session that ties the page to one visitor."
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:97
+msgid "If every page reports this, find the plugin or theme that starts a session for every visitor and ask its author to limit it to the pages that need one."
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:99
+msgid "The page opened a cart"
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:99
+msgid "The response set the %s cookie, opening a cart or store session for this visitor."
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:101
+msgid "The page set one of your excluded cookies"
+msgstr ""
+
+#. translators: %s: a cookie name.
+#: includes/cache/class-bypass-templates.php:101
+msgid "The response set the %s cookie, which is on your \"Never cache when these cookies are present\" list."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:102
+msgid "Security token on the page"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:102
+msgid "The HTML contains a WordPress security token (nonce) that has to be fresh for each visitor. A cached token breaks form submissions."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:102
+msgid "Usually a form on the page. Logout links in menus are already allowed for and do not cause this."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:103
+msgid "Code vetoed the write"
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:103
+msgid "Another plugin, or code in your theme, used the cachingout_response_is_cacheable filter to stop this page being stored."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:103
+msgid "The code that uses the filter decides. Search your plugins and theme for that filter name, or deactivate plugins one at a time."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:115
+msgid "Not cached"
+msgstr ""
+
+#. translators: %s: a bypass reason code, e.g. BYPASS:nonce.
+#: includes/cache/class-bypass-templates.php:117
+msgid "The page was not cached and the reason code is %s. Every code is listed in the troubleshooting guide."
+msgstr ""
+
+#: includes/cache/class-bypass-templates.php:119
+msgid "Look the code up in the troubleshooting guide, or quote it when asking for support."
+msgstr ""
+
 #: includes/cache/class-dropin-owner.php:279
 #: includes/cache/class-dropin-owner.php:302
 msgid "an unknown plugin"
@@ -1593,7 +2125,7 @@ msgstr ""
 msgid "A persistent object cache (Redis/Memcached) was detected on your site. This is great — object caching and page caching work at different layers and complement each other. Caching Out handles page caching, browser caching, and front-end optimization; your object cache speeds up database queries. No configuration is needed."
 msgstr ""
 
-#: includes/class-plugin.php:779
+#: includes/class-plugin.php:786
 msgid "Caching Out could not update .htaccess for Browser Caching:"
 msgstr ""
 

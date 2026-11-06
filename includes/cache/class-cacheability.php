@@ -486,6 +486,133 @@ class CachingOut_Cacheability {
 	}
 
 	/**
+	 * The desktop User-Agent decide_for() simulates when none is given.
+	 *
+	 * @since 1.27.0
+	 * @var string
+	 */
+	const SIMULATED_USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36 CachingOut-PageCheck';
+
+	/**
+	 * The chokepoint's verdict for a simulated anonymous request, as one
+	 * structured answer ("Why isn't this page cached?", 1.27.0).
+	 *
+	 * Pure: it adds NO cache-or-not condition of its own. It normalises the
+	 * input, calls request_is_cacheable() with the same arguments the drop-in
+	 * would pass and, when a response sample is given and the request stage
+	 * passed, response_is_cacheable() for the storage verdict. The only
+	 * verdict decided here is `BYPASS:foreign-host`: a URL on another host is
+	 * not this site's request and is refused before anything is evaluated.
+	 * Shared with the assistant (spec 39 task 10), so the shape is stable.
+	 *
+	 * Input keys, all optional except `url`:
+	 *   'url'        => string  Path (`/about/`) or absolute URL of THIS site.
+	 *   'method'     => string  HTTP method. Default 'GET'.
+	 *   'cookies'    => array   Cookie name => value. Default none.
+	 *   'user_agent' => string  Default SIMULATED_USER_AGENT (desktop).
+	 *   'response'   => array{ status: int, headers: array, html: string }
+	 *                   A captured response for the storage stage.
+	 *
+	 * @since 1.27.0
+	 *
+	 * @param array $request The simulated request, see above.
+	 * @return array{stage: string, verdict: bool|string, reason: string, url: string}
+	 *               `stage` is 'request' or 'response' when that stage bypassed,
+	 *               'ok' when every stage asked passed; `verdict` is the raw
+	 *               chokepoint return; `reason` the `BYPASS:...` code or ''.
+	 */
+	public function decide_for( array $request ): array {
+		$method     = isset( $request['method'] ) && '' !== (string) $request['method'] ? (string) $request['method'] : 'GET';
+		$cookies    = isset( $request['cookies'] ) && is_array( $request['cookies'] ) ? $request['cookies'] : array();
+		$user_agent = isset( $request['user_agent'] ) && '' !== (string) $request['user_agent'] ? (string) $request['user_agent'] : self::SIMULATED_USER_AGENT;
+		$raw_url    = isset( $request['url'] ) ? (string) $request['url'] : '/';
+
+		$url = $this->local_request_uri( $raw_url );
+		if ( null === $url ) {
+			return $this->decision( 'request', 'BYPASS:foreign-host', $raw_url );
+		}
+
+		$verdict = $this->request_is_cacheable( $method, $url, $cookies, $user_agent );
+		if ( true !== $verdict ) {
+			return $this->decision( 'request', $verdict, $url );
+		}
+
+		if ( ! isset( $request['response'] ) || ! is_array( $request['response'] ) ) {
+			return $this->decision( 'ok', true, $url );
+		}
+
+		$response = $request['response'];
+		$status   = isset( $response['status'] ) ? (int) $response['status'] : 200;
+		$headers  = isset( $response['headers'] ) && is_array( $response['headers'] ) ? $response['headers'] : array();
+		$html     = isset( $response['html'] ) ? (string) $response['html'] : '';
+
+		$verdict = $this->response_is_cacheable( $status, $headers, $html );
+		if ( true !== $verdict ) {
+			return $this->decision( 'response', $verdict, $url );
+		}
+
+		return $this->decision( 'ok', true, $url );
+	}
+
+	/**
+	 * Shape one decide_for() answer.
+	 *
+	 * @since 1.27.0
+	 *
+	 * @param string      $stage   'request', 'response' or 'ok'.
+	 * @param bool|string $verdict The chokepoint's raw return.
+	 * @param string      $url     The request URI evaluated (or refused).
+	 * @return array{stage: string, verdict: bool|string, reason: string, url: string}
+	 */
+	private function decision( string $stage, $verdict, string $url ): array {
+		return array(
+			'stage'   => $stage,
+			'verdict' => $verdict,
+			'reason'  => true === $verdict ? '' : (string) $verdict,
+			'url'     => $url,
+		);
+	}
+
+	/**
+	 * Reduce a path or absolute URL to the request URI this site would see.
+	 *
+	 * A path is returned with a leading slash (query string kept). An
+	 * absolute URL loses its scheme and host when the host is this site's
+	 * (`home_url()`, compared case-insensitively); any other host returns
+	 * null. Runs where WordPress is loaded (the admin tool, the assistant),
+	 * never in the drop-in.
+	 *
+	 * @since 1.27.0
+	 *
+	 * @param string $raw_url Path or absolute URL.
+	 * @return string|null The request URI, or null for a foreign host.
+	 */
+	private function local_request_uri( string $raw_url ): ?string {
+		$raw_url = trim( $raw_url );
+		$parts   = wp_parse_url( $raw_url );
+		if ( false === $parts ) {
+			return null;
+		}
+
+		if ( isset( $parts['host'] ) ) {
+			$site_host = (string) wp_parse_url( home_url( '/' ), PHP_URL_HOST );
+			if ( strtolower( $parts['host'] ) !== strtolower( $site_host ) ) {
+				return null;
+			}
+		}
+
+		$path = isset( $parts['path'] ) && '' !== $parts['path'] ? $parts['path'] : '/';
+		if ( '/' !== $path[0] ) {
+			$path = '/' . $path;
+		}
+		if ( isset( $parts['query'] ) && '' !== $parts['query'] ) {
+			$path .= '?' . $parts['query'];
+		}
+
+		return $path;
+	}
+
+	/**
 	 * Determine whether a response may be written to the page cache.
 	 *
 	 * Called after WordPress has rendered the page (e.g. in an ob_start

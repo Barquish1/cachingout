@@ -3,7 +3,7 @@
  * Plugin Name:       Caching Out
  * Plugin URI:        https://cachingout.com/docs/
  * Description:       Page caching, browser caching, compression and lazy loading - on the moment you activate. Never cached for logged-in visitors or carts.
- * Version:           1.26.0
+ * Version:           1.27.0
  * Requires at least: 6.4
  * Requires PHP:      7.4
  * Author:            Caching Out
@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * CACHINGOUT_VERSION must match the Version header above and readme.txt's
  * stable tag. The release script enforces this.
  */
-define( 'CACHINGOUT_VERSION', '1.26.0' );
+define( 'CACHINGOUT_VERSION', '1.27.0' );
 
 
 
@@ -152,7 +152,7 @@ register_activation_hook(
 			}
 		}
 
-		$report = CachingOut_Activator::activate_with_report();
+		$report                = CachingOut_Activator::activate_with_report();
 		$report['show_notice'] = true;
 		update_option( 'cachingout_activation_report', $report, false );
 		update_option( 'cachingout_installed_version', CACHINGOUT_VERSION, false );
@@ -228,7 +228,7 @@ add_action(
 			&& wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'cachingout_fs_check' )
 		) {
 			require_once CACHINGOUT_PATH . 'includes/class-activator.php';
-			$report = CachingOut_Activator::activate_with_report();
+			$report                = CachingOut_Activator::activate_with_report();
 			$report['show_notice'] = true;
 			update_option( 'cachingout_activation_report', $report, false );
 			update_option( 'cachingout_installed_version', CACHINGOUT_VERSION, false );
@@ -247,7 +247,7 @@ add_action(
 		}
 
 		require_once CACHINGOUT_PATH . 'includes/class-activator.php';
-		$report = CachingOut_Activator::activate_with_report();
+		$report                = CachingOut_Activator::activate_with_report();
 		$report['show_notice'] = true;
 		update_option( 'cachingout_activation_report', $report, false );
 		update_option( 'cachingout_installed_version', CACHINGOUT_VERSION, false );
@@ -272,14 +272,14 @@ add_action(
 		// directly — this closure must never depend on the plugin having
 		// booted. A FAILED report is always shown: suppressing a broken
 		// install's only warning would hide real damage.
-		$fs_settings   = get_option( 'cachingout_settings', array() );
-		$fs_check_on   = ! isset( $fs_settings['cache']['fs_check_enabled'] )
+		$fs_settings = get_option( 'cachingout_settings', array() );
+		$fs_check_on = ! isset( $fs_settings['cache']['fs_check_enabled'] )
 			|| ! empty( $fs_settings['cache']['fs_check_enabled'] );
 		if ( ! $fs_check_on && ! empty( $report['ok'] ) ) {
 			return;
 		}
-		$ok = ! empty( $report['ok'] );
-		$class = ( $ok ? 'notice notice-success is-dismissible' : 'notice notice-error' ) . ' cachingout-notice';
+		$ok        = ! empty( $report['ok'] );
+		$class     = ( $ok ? 'notice notice-success is-dismissible' : 'notice notice-error' ) . ' cachingout-notice';
 		$check_url = wp_nonce_url(
 			add_query_arg( 'cachingout_fs_check', '1' ),
 			'cachingout_fs_check'

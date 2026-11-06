@@ -145,3 +145,10 @@ $cache = $settings['cache'];
 		<button type="submit" class="rs-button rs-button--primary"><?php esc_html_e( 'Save Changes', 'cachingout' ); ?></button>
 	</p>
 </form>
+
+<?php
+// "Check a page: why isn't it cached?" (1.27.0). Its own form, outside the
+// settings form: it saves nothing.
+if ( class_exists( 'CachingOut_Page_Check' ) ) {
+	CachingOut_Page_Check::render_section();
+}

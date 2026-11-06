@@ -1389,7 +1389,7 @@ class CachingOut_Activator {
 					)
 				);
 			}
-			// phpcs:ignore PluginCheck.CodeAnalysis.WriteFile.ABSPATHDetected -- Writes the plugin's marked block in the site's own .htaccess (backup first, restored on failure); not user data.
+			// phpcs:ignore PluginCheck.CodeAnalysis.WriteFile.ABSPATHDetected -- Writes the plugin's marked block in the site's own .htaccess (atomic replace, original restored on failure); not user data.
 			$created = @file_put_contents( $htaccess_path, '', LOCK_EX );
 			if ( false === $created ) {
 				return new \WP_Error(

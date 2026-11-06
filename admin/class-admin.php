@@ -79,6 +79,22 @@ class CachingOut_Admin {
 	private $fs_check_page = null;
 
 	/**
+	 * The chokepoint the Cache tab's page check asks (1.27.0).
+	 *
+	 * @since 1.27.0
+	 * @var CachingOut_Cacheability|null
+	 */
+	private $cacheability = null;
+
+	/**
+	 * Page check tool controller (lazily created).
+	 *
+	 * @since 1.27.0
+	 * @var CachingOut_Page_Check|null
+	 */
+	private $page_check = null;
+
+	/**
 	 * The FREE edition's tabs, in display order.
 	 *
 	 * Each entry: id, label, section, icon, group, order (within its group;
@@ -240,6 +256,36 @@ class CachingOut_Admin {
 	}
 
 	/**
+	 * Attach the wired chokepoint for the "Check a page" tool.
+	 *
+	 * @since 1.27.0
+	 *
+	 * @param CachingOut_Cacheability $cacheability The chokepoint.
+	 * @return void
+	 */
+	public function set_cacheability( CachingOut_Cacheability $cacheability ) {
+		$this->cacheability = $cacheability;
+	}
+
+	/**
+	 * The "Check a page: why isn't it cached?" controller, created on first
+	 * use. Without a wired chokepoint (tests, early callers) it asks a
+	 * fresh one built from the settings, which carries the built-in rules
+	 * but no compat-module callbacks.
+	 *
+	 * @since 1.27.0
+	 * @return CachingOut_Page_Check|null Null when the class is not loaded.
+	 */
+	public function page_check() {
+		if ( null === $this->page_check && class_exists( 'CachingOut_Page_Check' ) ) {
+			$cacheability     = $this->cacheability ? $this->cacheability : new CachingOut_Cacheability( $this->settings );
+			$this->page_check = new CachingOut_Page_Check( $cacheability );
+		}
+
+		return $this->page_check;
+	}
+
+	/**
 	 * The Filesystem Check page controller, created on first use.
 	 *
 	 * @since 0.1.17
@@ -356,6 +402,11 @@ class CachingOut_Admin {
 		$fs_page = $this->filesystem_check_page();
 		if ( $fs_page ) {
 			$fs_page->register();
+		}
+
+		$page_check = $this->page_check();
+		if ( $page_check ) {
+			$page_check->register();
 		}
 
 		add_filter( 'plugin_action_links_' . CACHINGOUT_BASENAME, array( $this, 'plugin_action_links' ) );

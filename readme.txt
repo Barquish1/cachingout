@@ -4,7 +4,7 @@ Tags: cache, performance, page cache, lazyload, minify
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.26.0
+Stable tag: 1.27.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -222,6 +222,9 @@ Fixes automatic image dimensions resizing images your theme scales with CSS, suc
 Caching Out is now a free plugin on WordPress.org, with the features listed above switched on as they were. Every setting keeps its value and nothing is switched on or off by the upgrade.
 
 == Changelog ==
+
+= 1.27.0 =
+* Added: "Check a page: why isn't it cached?" on the Cache tab. Enter a page address and Caching Out tells you, in plain English, what the cache decided for an anonymous visitor and why: whether that is correct behaviour (a cart page, a logged-in page, a page that asked not to be cached) or something you can change, with the fix and the matching help page. Optionally fetches the page as a visitor to check the stored copy too. Every bypass reason the cache can give now has an explanation.
 
 = 1.26.0 =
 * Fixed: deleting Caching Out removed any define( 'WP_CACHE', ... ) line from wp-config.php, including one that belonged to another caching plugin, which could switch that plugin's page cache off. Uninstall now removes only the line Caching Out wrote, and leaves wp-config.php alone when another plugin's advanced-cache.php is present.
