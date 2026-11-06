@@ -87,6 +87,41 @@ class CachingOut_EDD {
 		$this->register_cookie_exclusions();
 		$this->register_purge_hooks();
 		$this->register_snapshot_prefixes();
+		add_filter( 'cachingout_skip_optimization', array( $this, 'skip_optimization_on_store_pages' ) );
+	}
+
+	/**
+	 * Switch file optimisation off on the pages where a sale is made.
+	 *
+	 * The same rule as WooCommerce's store pages: these pages are never cached,
+	 * are mostly visited once, and are where a broken script costs the most. A
+	 * payment gateway's scripts must run in their own order, so nothing is
+	 * minified, combined, deferred or delayed here. Lazy loading and main-image
+	 * priority are page filters and still run.
+	 *
+	 * @since 1.27.1
+	 *
+	 * @param mixed $reason Reason from an earlier callback, '' for none.
+	 * @return mixed An `edd-*` reason, or `$reason` unchanged.
+	 */
+	public function skip_optimization_on_store_pages( $reason ) {
+		if ( true === $reason || ( is_string( $reason ) && '' !== $reason ) ) {
+			return $reason;
+		}
+
+		$pages = array(
+			'edd_is_checkout'                => 'edd-checkout',
+			'edd_is_success_page'            => 'edd-success',
+			'edd_is_failed_transaction_page' => 'edd-failed',
+			'edd_is_purchase_history_page'   => 'edd-history',
+		);
+		foreach ( $pages as $conditional => $name ) {
+			if ( function_exists( $conditional ) && $conditional() ) {
+				return $name;
+			}
+		}
+
+		return $reason;
 	}
 
 	/**

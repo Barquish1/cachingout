@@ -96,7 +96,7 @@ $cachingout_pro_on        = class_exists( 'CachingOut_Features' ) && CachingOut_
 				<li class="rs-list__item"><?php esc_html_e( 'WP-CLI commands; settings export and import; Multisite Network Admin', 'cachingout' ); ?></li>
 				<li class="rs-list__item">
 					<div class="rs-list__body">
-						<?php esc_html_e( 'Email support from the team who built it - plus an assistant that already knows your setup. It knows which plugins you run, which settings you have on and what the Page Audit found, so you never have to explain your site before asking a question. Every answer points at the documentation or the rule it came from.', 'cachingout' ); ?>
+						<?php esc_html_e( 'Email support from the team who built it - plus an assistant that already knows your setup. It knows which plugins you run, which settings you have on and what the Page Audit found, so you never have to explain your site before asking a question. Answers draw on our documentation and the plugin\'s own decision for your page, with links so you can check. They can be wrong, so check anything important.', 'cachingout' ); ?>
 						<p class="rs-help rs-mt-2"><?php esc_html_e( 'The assistant is scoped to Caching Out and your site\'s configuration: 50 questions a day and 300 a month per licence. It is not a general-purpose chatbot; answers are AI-generated and can be wrong, so check anything consequential against the linked source.', 'cachingout' ); ?></p>
 					</div>
 				</li>

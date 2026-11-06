@@ -259,7 +259,7 @@ class CachingOut_Page_Check {
 			<div class="rs-card__body rs-stack">
 				<p class="rs-text--muted rs-text--mono"><?php echo esc_html( $decision['url'] ); ?></p>
 				<?php if ( null === $explanation ) : ?>
-					<p><?php echo esc_html( $result['fetched'] ? __( 'Every rule passed: the request may be served from cache and the page the site returned may be written to it. The first anonymous visit stores it; the next is a HIT.', 'cachingout' ) : __( 'Every request-stage rule passed. Tick "Also fetch the page" to run the rules that apply after the page is generated.', 'cachingout' ) ); ?></p>
+					<p><?php echo esc_html( $result['fetched'] ? __( 'Every rule passed: this page can be saved and served from the cache. The first visitor who is not logged in creates the saved copy, and the visitors after them get it.', 'cachingout' ) : __( 'Every request-stage rule passed. Tick "Also fetch the page" to run the rules that apply after the page is generated.', 'cachingout' ) ); ?></p>
 				<?php else : ?>
 					<p><?php echo esc_html( $explanation['meaning'] ); ?></p>
 					<p class="rs-text--semibold">

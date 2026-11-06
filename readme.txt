@@ -4,7 +4,7 @@ Tags: cache, performance, page cache, lazyload, minify
 Requires at least: 6.4
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.27.0
+Stable tag: 1.27.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -94,7 +94,7 @@ The free plugin above is complete on its own and stays free. Caching Out Pro is 
 * Database: scheduled cleanup, orphaned metadata and table optimisation
 * CDN rewriting, and purge add-ons for Cloudflare, Varnish and Sucuri
 * WP-CLI commands, settings export and import, and Multisite Network Admin
-* Email support from the team who built it - plus an assistant that already knows your setup. It knows which plugins you run, which settings you have on and what the Page Audit found, so you never have to explain your site before asking a question. Every answer points at the documentation or the rule it came from.
+* Email support from the team who built it - plus an assistant that already knows your setup. It knows which plugins you run, which settings you have on and what the Page Audit found, so you never have to explain your site before asking a question. Answers draw on our documentation and the plugin's own decision for your page, with links so you can check. They can be wrong, so check anything important.
 
 The assistant is scoped to Caching Out and your site's configuration: 50 questions a day and 300 a month per licence. It is not a general-purpose chatbot; answers are AI-generated and can be wrong, so check anything consequential against the linked source.
 
@@ -222,6 +222,11 @@ Fixes automatic image dimensions resizing images your theme scales with CSS, suc
 Caching Out is now a free plugin on WordPress.org, with the features listed above switched on as they were. Every setting keeps its value and nothing is switched on or off by the upgrade.
 
 == Changelog ==
+
+= 1.27.1 =
+* Fixed: file optimisation now leaves Easy Digital Downloads checkout, purchase history, success and failed transaction pages alone, as it already did for WooCommerce cart, checkout and account pages, so a delayed or combined script cannot break a sale.
+* Changed: Check a page explains a passing result in plain language.
+* Changed: the description of the Pro assistant now says what its answers draw on.
 
 = 1.27.0 =
 * Added: "Check a page: why isn't it cached?" on the Cache tab. Enter a page address and Caching Out tells you, in plain English, what the cache decided for an anonymous visitor and why: whether that is correct behaviour (a cart page, a logged-in page, a page that asked not to be cached) or something you can change, with the fix and the matching help page. Optionally fetches the page as a visitor to check the stored copy too. Every bypass reason the cache can give now has an explanation.
